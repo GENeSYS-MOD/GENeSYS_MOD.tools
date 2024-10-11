@@ -1,0 +1,21 @@
+Transportation|Freight|Rail|Oil,Gtkm/yr
+Transportation|Freight|Rail|Electric,Gtkm/yr
+Transportation|Freight|Road|Electric|Battery,Gtkm/yr
+Transportation|Freight|Road|Electric|Fuel Cell,Gtkm/yr
+Transportation|Freight|Road|Internal Combustion Engine|Oil,Gtkm/yr
+Transportation|Freight|Road|Internal Combustion Engine|LNG,Gtkm/yr
+Transportation|Freight|Road|Electric|Overhead,Gtkm/yr
+Transportation|Freight|Road|Plugin Hybrid,Gtkm/yr
+Transportation|Freight|Maritime|Biofuels,Gtkm/yr
+Transportation|Freight|Maritime|Oil,Gtkm/yr
+Transportation|Freight|Maritime|LNG,Gtkm/yr
+Transportation|Passenger|Air|Biofuels,Gpkm/yr
+Transportation|Passenger|Air|Oil,Gpkm/yr
+Transportation|Passenger|Air|Hydrogen,Gpkm/yr
+Transportation|Passenger|Rail|Oil,Gpkm/yr
+Transportation|Passenger|Rail|Electric,Gpkm/yr
+Transportation|Passenger|Road|Electric|Battery,Gpkm/yr
+Transportation|Passenger|Road|Electric|Fuel Cell,Gpkm/yr
+Transportation|Passenger|Road|Plugin Hybrid,Gpkm/yr
+Transportation|Passenger|Road|Internal Combustion Engine|Oil,Gpkm/yr
+Transportation|Passenger|Road|Internal Combustion Engine|LNG,Gpkm/yr
