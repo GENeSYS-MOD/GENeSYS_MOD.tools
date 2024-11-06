@@ -715,6 +715,8 @@ def get_cutout(filename, timeframe, module="era5", regions=None, cutout_north_we
 
     elif (cutout_north_west==None) & (cutout_south_east==None):
         country = get_country_geometry(regions=regions, natural_earth_dataset=natural_earth_dataset)
+        buffer = 1.0
+        country = country.buffer(buffer)
 
         cutout = atlite.Cutout(path=dir,
                                module=module,
