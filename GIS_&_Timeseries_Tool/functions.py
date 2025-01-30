@@ -31,6 +31,7 @@ warnings.simplefilter('ignore')
 logging.captureWarnings(False)
 logging.basicConfig(level=logging.INFO)
 
+
 ###########################
 ## preparing coordinates ##
 ###########################
@@ -69,39 +70,44 @@ def get_coords(
     coords_offshore = coords_raw_df.merge(coords, on=['x', 'y'], how='left', indicator=True)
     coords_offshore = coords_offshore[coords_offshore['_merge'] == 'left_only']
 
-    coords_offshore = coords_offshore[["x", "y"]]
-    coords_offshore["coords"] = coords_offshore["y"].astype(str) + ", " + coords_offshore["x"].astype(str)
+    if coords_offshore.empty:
+        print("Warning: No offshore coordinates in the selected cutout")
+    else:
+        coords_offshore = coords_offshore[["x", "y"]]
+        coords_offshore["coords"] = coords_offshore["y"].astype(str) + ", " + coords_offshore["x"].astype(str)
 
-    # haversine formula to get the shortest distance to coastline to assign countries
-    tree = BallTree(np.deg2rad(coords[['x', 'y']].values), metric='haversine')
+        # haversine formula to get the shortest distance to coastline to assign countries
+        tree = BallTree(np.deg2rad(coords[['x', 'y']].values), metric='haversine')
 
-    query_lons = coords_offshore['x']
-    query_lats = coords_offshore['y']
+        query_lons = coords_offshore['x']
+        query_lats = coords_offshore['y']
 
-    distances, index = tree.query(np.deg2rad(np.c_[query_lons, query_lats]))
+        distances, index = tree.query(np.deg2rad(np.c_[query_lons, query_lats]))
 
-    index = [item for sublist in index for item in sublist]
-    distance = [item * 6371.0 / 1.852 for sublist in distances for item in sublist]
+        index = [item for sublist in index for item in sublist]
+        distance = [item * 6371.0 / 1.852 for sublist in distances for item in sublist]
 
-    nearest = []
+        nearest = []
 
-    for ind, dist in zip(index, distance):
-        nearest.append([coords.iloc[ind]['iso_a2'], coords.iloc[ind]['iso_3166_2'], dist])
+        for ind, dist in zip(index, distance):
+            nearest.append([coords.iloc[ind]['iso_a2'], coords.iloc[ind]['iso_3166_2'], dist])
 
-    nearest = np.array(nearest)
+        nearest = np.array(nearest)
 
-    coords_offshore['region'] = nearest[:, 0]
-    coords_offshore['subregion'] = nearest[:, 1]
-    coords_offshore['distance'] = nearest[:, 2]
+        coords_offshore['region'] = nearest[:, 0]
+        coords_offshore['subregion'] = nearest[:, 1]
+        coords_offshore['distance'] = nearest[:, 2]
 
-    coords_offshore = coords_offshore[coords_offshore['region'].isin(regions)]
+        coords_offshore = coords_offshore[coords_offshore['region'].isin(regions)]
 
     if admin == 0:
         coords_onshore = coords_onshore.drop(columns=['subregion'])
-        coords_offshore = coords_offshore.drop(columns=['subregion'])
+        if not coords_offshore.empty:
+            coords_offshore = coords_offshore.drop(columns=['subregion'])
     elif admin == 1:
         coords_onshore = coords_onshore.drop(columns=['region']).rename(columns={'subregion': 'region'})
-        coords_offshore = coords_offshore.drop(columns=['region']).rename(columns={'subregion': 'region'})
+        if not coords_offshore.empty:
+            coords_offshore = coords_offshore.drop(columns=['region']).rename(columns={'subregion': 'region'})
 
     return coords_onshore, coords_offshore
 
