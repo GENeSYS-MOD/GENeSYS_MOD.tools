@@ -21,10 +21,14 @@ definition = nomenclature.DataStructureDefinition(definition_dir)
 logging.basicConfig(level=logging.INFO)
 
 class Pathways(Enum):
-    TF = "TechnoFriendly"
-    DT = "DirectedTransition"
-    GD = "GradualDevelopment"
-    SC = "SocietalCommitment"
+#    TF = "TechnoFriendly"
+#    DT = "DirectedTransition"
+#    GD = "GradualDevelopment"
+#    SC = "SocietalCommitment"
+    GR = "GoRES"
+    RE = "REPowerEU++"
+    NE = "NECPEssentials"
+    TR = "Trinity"
 
 
 def generate_data(input_file: str, file_type: str = "gdx", generate_series_data: bool = False, generate_load_factors: bool = False, generate_transmission_data: bool = False,
