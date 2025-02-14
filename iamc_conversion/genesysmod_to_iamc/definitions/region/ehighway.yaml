@@ -644,7 +644,7 @@
       definition: Italy|Subgrid 52 + Italy|Subgrid 53
       ehighway2050: 52_IT + 53_IT
       note: This region was defined and used in the plan4res public datasets, it is
-        built as aggregation of ehighway2050 regions; ITN+ITS=IT
+        built as aggregation of ehighway2050 regions ITN+ITS=IT
       plan4res: ITN
   - Italy|Subgrid south:
       country: Italy
@@ -652,7 +652,7 @@
         98
       ehighway2050: 54_IT + 55_IT + 56_IT + 98_IT
       note: This region was defined and used in the plan4res public datasets, it is
-        built as aggregation of ehighway2050 regions; ITN+ITS=IT
+        built as aggregation of ehighway2050 regions ITN+ITS=IT
       plan4res: ITS
   - United Kingdom|North Sea:
       country: United Kingdom

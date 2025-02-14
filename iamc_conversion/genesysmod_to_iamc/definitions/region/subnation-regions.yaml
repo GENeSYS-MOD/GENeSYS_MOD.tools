@@ -6,7 +6,7 @@
         plants connected by same watercourse)
       notes: This region was defined in the HydroCen dataset based on the Norwegian
         hydropower system and electricity price regions
-      source: https://energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
+      source: energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
   - Norway|Sorost:
       HydroCen: N2
       country: Norway
@@ -14,7 +14,7 @@
         plants connected by same watercourse
       notes: This region was defined in the HydroCen dataset based on the Norwegian
         hydropower system and electricity price regions
-      source: https://energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
+      source: energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
   - Norway|Hallingdal:
       HydroCen: N3
       country: Norway
@@ -22,7 +22,7 @@
         plants connected by same watercourse)
       notes: This region was defined in the HydroCen dataset based on the Norwegian
         hydropower system and electricity price regions
-      source: https://energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
+      source: energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
   - Norway|Telemark:
       HydroCen: N4
       country: Norway
@@ -30,7 +30,7 @@
         plants connected by same watercourse)
       notes: This region was defined in the HydroCen dataset based on the Norwegian
         hydropower system and electricity price regions
-      source: https://energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
+      source: energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
   - Norway|Sorland:
       HydroCen: N5
       country: Norway
@@ -38,7 +38,7 @@
         plants connected by same watercourse)
       notes: This region was defined in the HydroCen dataset based on the Norwegian
         hydropower system and electricity price regions
-      source: https://energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
+      source: energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
   - Norway|Vestsyd:
       HydroCen: N6
       country: Norway
@@ -46,7 +46,7 @@
         plants connected by same watercourse)
       notes: This region was defined in the HydroCen dataset based on the Norwegian
         hydropower system and electricity price regions
-      source: https://energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
+      source: energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
   - Norway|Vestmidt:
       HydroCen: N7
       country: Norway
@@ -54,7 +54,7 @@
         plants connected by same watercourse)
       notes: This region was defined in the HydroCen dataset based on the Norwegian
         hydropower system and electricity price regions
-      source: https://energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
+      source: energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
   - Norway|Norgemidt:
       HydroCen: N8
       country: Norway
@@ -62,7 +62,7 @@
         plants connected by same watercourse)
       notes: This region was defined in the HydroCen dataset based on the Norwegian
         hydropower system and electricity price regions
-      source: https://energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
+      source: energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
   - Norway|Helgeland:
       HydroCen: N9
       country: Norway
@@ -70,7 +70,7 @@
         plants connected by same watercourse)
       notes: This region was defined in the HydroCen dataset based on the Norwegian
         hydropower system and electricity price regions
-      source: https://energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
+      source: energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
   - Norway|Troms:
       HydroCen: N10
       country: Norway
@@ -78,7 +78,7 @@
         plants connected by same watercourse)
       notes: This region was defined in the HydroCen dataset based on the Norwegian
         hydropower system and electricity price regions
-      source: https://energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
+      source: energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
   - Norway|Finnmark:
       HydroCen: N11
       country: Norway
@@ -86,4 +86,4 @@
         plants connected by same watercourse)
       notes: This region was defined in the HydroCen dataset based on the Norwegian
         hydropower system and electricity price regions
-      source: https://energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
+      source: energifaktanorge.no/en/norsk-energiforsyning/kraftmarkedet/
