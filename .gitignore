@@ -1,2 +1,5 @@
 GIS_&_Timeseries_Tool/geodata/corine.tif
 iamc_conversion/genesysmod_to_iamc/__pycache__/
+iamc_conversion/.ipynb_checkpoints/
+iamc_conversion/genesysmod_to_iamc/out/
+iamc_conversion/genesysmod_to_iamc/input/
