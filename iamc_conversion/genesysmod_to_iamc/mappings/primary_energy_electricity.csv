@@ -3,7 +3,7 @@ P_Biomass,Primary Energy|Biomass|Electricity|w/o CCS
 P_Coal_Hardcoal,Primary Energy|Coal|Electricity|w/o CCS
 P_Coal_Lignite,Primary Energy|Coal|Electricity|w/o CCS
 P_Oil,Primary Energy|Oil|Electricity|w/o CCS
-RES_Ocean,Primary Energy|Ocean
+P_Ocean,Primary Energy|Ocean
 CHP_Gas_CCGT_Natural,Primary Energy|Gas|Electricity|w/o CCS
 CHP_Gas_CCGT_Natural_CCS,Primary Energy|Gas|Electricity|w/ CCS
 CHP_Biomass_Solid,Primary Energy|Biomass|Electricity|w/o CCS

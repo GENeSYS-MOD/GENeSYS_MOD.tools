@@ -9,8 +9,8 @@
 #    e.g., electricity, fossil, liquid, solid, coal, biomass, solar...
 #    use of 'energy sources' for producing electricity are not accounted here
 # Note that:
-# - "GWh" is used for data in a subannual resolution 
-# - "EJ/yr" is used for data in a yearly resolution (i.e., a single value for one year (e.g., 2020) and not the time period until the next data point).
+# - GWh is used for data in a subannual resolution 
+# - EJ/yr is used for data in a yearly resolution (i.e., a single value for one year (e.g., 2020) and not the time period until the next data point).
 
 - Final Energy:
     description: Total final energy consumption by all end-use sectors and all fuels,

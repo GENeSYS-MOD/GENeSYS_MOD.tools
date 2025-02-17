@@ -8,7 +8,7 @@ DEF_INPUT_PATH = Path(__file__).parent / 'input'
 DEF_OUTPUT_PATH = Path(__file__).parent / 'out'
 
 # define the model version that is used for the output files
-DEF_MODEL_AND_VERSION = 'GENeSYS-MOD 3.1'
+DEF_MODEL_AND_VERSION = 'GENeSYS-MOD 4.0'
 
 
 DEF_PRODUCTION_COLUMNS = ["region",
@@ -81,6 +81,11 @@ DEF_MAP_SCENARIOS = {
     'DirectedTransition_globalLimit': 'Directed Transition 2.0',
     'GradualDevelopment_globalLimit': 'Gradual Development 2.0',
     'SocietalCommitment_globalLimit': 'Societal Commitment 2.0',
+    'Green_globalLimit': 'Go RES 0.9.1',
+    'NECPEssentials_globalLimit': 'NECP Essentials 0.9.1',
+    'REPowerEU_globalLimit': 'REPowerEU++ 0.9.1',
+    'Trinity_globalLimit': 'Trinity 0.9.1',
+    'GoRES_globalLimit': 'Go RES 0.9.1',
 }
 
 # define the list of files to use for the respective scenarios
@@ -89,10 +94,15 @@ DEF_MAP_FILE_SCENARIOS = {
     'DirectedTransition': 'Directed Transition 2.0',
     'GradualDevelopment': 'Gradual Development 2.0',
     'SocietalCommitment': 'Societal Commitment 2.0',
+    'GoRES': 'Go RES 0.9.1',
+    'NECPEssentials': 'NECP Essentials 0.9.1',
+    'REPowerEU++': 'REPowerEU++ 0.9.1',
+    'Trinity': 'Trinity 0.9.1'
 }
 
 # define the years that should be included in the outputs
-DEF_YEARS = [2018, 2020, 2025, 2030, 2035, 2040, 2045, 2050]
+#DEF_YEARS = [2018, 2020, 2025, 2030, 2035, 2040, 2045, 2050]
+DEF_YEARS = [2018, 2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060]
 
 DEF_EU27 = ['AT', 'BE', 'BG', 'HR', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT',
                                      'LV', 'LT', 'LU', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE']

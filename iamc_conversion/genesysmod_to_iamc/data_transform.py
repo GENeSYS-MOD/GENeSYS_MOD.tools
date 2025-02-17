@@ -756,7 +756,7 @@ def _generate_load_factors(data_wrapper: dw.DataWrapper, excel_file: str, sheet_
     _dataframe = pd.read_excel(DEF_INPUT_PATH / excel_file, sheet_name)
     dataframe = _dataframe.copy()
 
-    timeseries = pd.Timestamp('2015-01-01') + pd.to_timedelta(dataframe.index, unit='H')
+    timeseries = pd.Timestamp('2015-01-01') + pd.to_timedelta(dataframe.index, unit='h')
     timeseries = timeseries.strftime('%m-%d %H:%M+01:00')
     dataframe.set_index(timeseries, inplace=True)
 
@@ -811,7 +811,7 @@ def _generate_demand_series(data_wrapper: dw.DataWrapper, excel_file: str, sheet
     _dataframe = pd.read_excel(DEF_INPUT_PATH / excel_file, sheet_name=sheet_name)
     dataframe = _dataframe.copy()
 
-    timeseries = pd.Timestamp('2015-01-01') + pd.to_timedelta(dataframe.index, unit='H')
+    timeseries = pd.Timestamp('2015-01-01') + pd.to_timedelta(dataframe.index, unit='h')
     timeseries = timeseries.strftime('%m-%d %H:%M+01:00')
     dataframe.set_index(timeseries, inplace=True)
 

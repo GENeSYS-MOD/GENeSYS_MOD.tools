@@ -51,18 +51,18 @@
 
 - Spillage|Electricity|{Storage Type}:
     description: Energy spillage that could not be stored by a {Storage Type} unit. Several energy models include spillage variables related to renewable
-      energy production; however, another way is to include a spillage variable to
+      energy production, however, another way is to include a spillage variable to
       the {Storage Type} unit since it is the last sink of the power network
     unit: [MWh, GWh]
 - Spillage|Electricity|Hydro|Reservoir:
-    description: Energy spillage that could not be stored by  Hydro Reservoir . Several energy models include spillage variables related to renewable
-      energy production; however, another way is to include a spillage variable to
-      the {Storage Type} unit since it is the last sink of the power network
+    description: Energy spillage that could not be stored by Hydro Reservoir. Several energy models include spillage variables related to renewable
+      energy production, however, another way is to include a spillage variable to
+      the Storage Type unit since it is the last sink of the power network
     unit: [MWh, GWh]
 - Spillage|Electricity|Hydro|Pumped Storage:
     description: Energy spillage that could not be stored by  pumped storage . Several energy models include spillage variables related to renewable
-      energy production; however, another way is to include a spillage variable to
-      the {Storage Type} unit since it is the last sink of the power network
+      energy production, however, another way is to include a spillage variable to
+      the Storage Type unit since it is the last sink of the power network
     unit: [MWh, GWh]
 
 - Operation Cost|Electricity|{Electricity Input}:
@@ -82,21 +82,21 @@
 
 - Reserve|Electricity|Automatic Frequency Restoration|{Electricity Input}:
     description: Automatic Frequency Restoration Reserve available for {Electricity Input}
-     power plants; this amount is the maximum available for the grid operator considering
+     power plants, this amount is the maximum available for the grid operator considering
      the commitment decisions taken by the model
     unit: [MWh, GWh]
     skip-region-aggregation: false
 
 - Reserve|Electricity|Frequency Containment|{Electricity Input}:
     description: Frequency Containment Reserve available for {Electricity Input}
-     power plants; this amount is the maximum available for the grid operator considering
+     power plants, this amount is the maximum available for the grid operator considering
      the commitment decisions taken by the model
     unit: [MWh, GWh]
     skip-region-aggregation: false
 
 - Reserve|Electricity|Frequency Containment|{Storage Type}:
     description: Frequency Containment Reserve available for {Storage Type}
-     units; this amount is the maximum available for the grid operator considering
+     units, this amount is the maximum available for the grid operator considering
      the commitment decisions taken by the model
     unit: [MWh, GWh]
     skip-region-aggregation: false

@@ -135,7 +135,7 @@
     weight: Secondary Energy|Hydrogen|Electricity
 
 - Price|Secondary Energy|Hydrogen|Fossil:
-    description: Price for hydrogen from natural gas ("grey hydrogen") at the secondary
+    description: Price for hydrogen from natural gas (grey hydrogen) at the secondary
       level, i.e. for large-scale consumers
     notes: Prices should include the effect of carbon prices.
     unit: [EUR_2020/GJ, USD_2010/GJ]

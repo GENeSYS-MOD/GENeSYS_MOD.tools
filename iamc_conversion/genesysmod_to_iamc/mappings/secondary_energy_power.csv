@@ -3,24 +3,24 @@ P_Coal_Lignite,Electricity|Coal|Lignite|w/o CCS
 P_Nuclear,Electricity|Nuclear
 P_Oil,Electricity|Oil|w/o CCS
 P_Biomass,Electricity|Biomass|w/o CCS
-RES_CSP,Electricity|Solar|CSP
-RES_CSP_Storage,Electricity|Solar|CSP
-RES_Geothermal,Electricity|Geothermal
-RES_Hydro_Large,Electricity|Hydro
-RES_Hydro_Small,Electricity|Hydro
-RES_Ocean,Electricity|Ocean
-RES_PV_Rooftop_Commercial,Electricity|Solar|PV
-RES_PV_Rooftop_Residential,Electricity|Solar|PV
-RES_PV_Utility_Avg,Electricity|Solar|PV
-RES_PV_Utility_Inf,Electricity|Solar|PV
-RES_PV_Utility_Opt,Electricity|Solar|PV
-Res_PV_Utility_Tracking,Electricity|Solar|PV
-RES_Wind_Offshore_Transitional,Electricity|Wind|Offshore
-RES_Wind_Offshore_Shallow,Electricity|Wind|Offshore
-RES_Wind_Offshore_Deep,Electricity|Wind|Offshore
-RES_Wind_Onshore_Avg,Electricity|Wind|Onshore
-RES_Wind_Onshore_Inf,Electricity|Wind|Onshore
-RES_Wind_Onshore_Opt,Electricity|Wind|Onshore
+P_CSP,Electricity|Solar|CSP
+P_CSP_Storage,Electricity|Solar|CSP
+P_Geothermal,Electricity|Geothermal
+P_Hydro_Reservoir,Electricity|Hydro
+P_Hydro_RoR,Electricity|Hydro
+P_Ocean,Electricity|Ocean
+P_PV_Rooftop_Commercial,Electricity|Solar|PV
+P_PV_Rooftop_Residential,Electricity|Solar|PV
+P_PV_Utility_Avg,Electricity|Solar|PV
+P_PV_Utility_Inf,Electricity|Solar|PV
+P_PV_Utility_Opt,Electricity|Solar|PV
+P_PV_Utility_Tracking,Electricity|Solar|PV
+P_Wind_Offshore_Transitional,Electricity|Wind|Offshore
+P_Wind_Offshore_Shallow,Electricity|Wind|Offshore
+P_Wind_Offshore_Deep,Electricity|Wind|Offshore
+P_Wind_Onshore_Avg,Electricity|Wind|Onshore
+P_Wind_Onshore_Inf,Electricity|Wind|Onshore
+P_Wind_Onshore_Opt,Electricity|Wind|Onshore
 P_Biomass_CCS,Electricity|Biomass|w/ CCS
 P_Coal_Hardcoal_CCS,Electricity|Coal|w/ CCS
 P_Coal_Lignite_CCS,Electricity|Coal|w/ CCS

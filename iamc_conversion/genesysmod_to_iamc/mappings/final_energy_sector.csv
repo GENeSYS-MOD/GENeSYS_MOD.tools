@@ -16,24 +16,24 @@ HLI_Hardcoal,Final Energy|Industry
 HLI_Lignite,Final Energy|Industry
 HLI_Oil_Boiler,Final Energy|Industry
 HLI_Solar_Thermal,Final Energy|Industry
-HMI_Biomass,Final Energy|Industry
-HMI_Gas,Final Energy|Industry
-HMI_Gas_CCS,Final Energy|Industry
-HMI_HardCoal,Final Energy|Industry
-HMI_HardCoal_CCS,Final Energy|Industry
-HMI_Oil,Final Energy|Industry
-HMI_Steam_Electric,Final Energy|Industry
-HLR_Biomass,Final Energy|Residential and Commercial
-HLR_Direct_Electric,Final Energy|Residential and Commercial
-HLR_Gas_Boiler,Final Energy|Residential and Commercial
-HLR_Geothermal,Final Energy|Residential and Commercial
-HLR_H2_Boiler,Final Energy|Residential and Commercial
-HLR_Hardcoal,Final Energy|Residential and Commercial
-HLR_Heatpump_Aerial,Final Energy|Residential and Commercial
-HLR_Heatpump_Ground,Final Energy|Residential and Commercial
-HLR_Lignite,Final Energy|Residential and Commercial
-HLR_Oil_Boiler,Final Energy|Residential and Commercial
-HLR_Solar_Thermal,Final Energy|Residential and Commercial
+HMHI_Biomass,Final Energy|Industry
+HMHI_Gas,Final Energy|Industry
+HMHI_Gas_CCS,Final Energy|Industry
+HMHI_HardCoal,Final Energy|Industry
+HMHI_HardCoal_CCS,Final Energy|Industry
+HMHI_Oil,Final Energy|Industry
+HMHI_Steam_Electric,Final Energy|Industry
+HB_Biomass,Final Energy|Residential and Commercial
+HB_Direct_Electric,Final Energy|Residential and Commercial
+HB_Gas_Boiler,Final Energy|Residential and Commercial
+HB_Geothermal,Final Energy|Residential and Commercial
+HB_H2_Boiler,Final Energy|Residential and Commercial
+HB_Hardcoal,Final Energy|Residential and Commercial
+HB_Heatpump_Aerial,Final Energy|Residential and Commercial
+HB_Heatpump_Ground,Final Energy|Residential and Commercial
+HB_Lignite,Final Energy|Residential and Commercial
+HB_Oil_Boiler,Final Energy|Residential and Commercial
+HB_Solar_Thermal,Final Energy|Residential and Commercial
 FRT_Rail_Conv,Final Energy|Transportation
 FRT_Rail_Electric,Final Energy|Transportation
 FRT_Road_BEV,Final Energy|Transportation
