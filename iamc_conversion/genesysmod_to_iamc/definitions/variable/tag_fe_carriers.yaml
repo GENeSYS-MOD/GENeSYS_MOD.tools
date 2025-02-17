@@ -15,7 +15,7 @@
       weight: Gases|Biomass
 
   - Gases|Electricity:
-      description: synthetic gaseous efuels ("power-to-gas")
+      description: synthetic gaseous efuels (power-to-gas)
       weight: Gases|Electricity
 
   - Gases|Fossil:
@@ -55,7 +55,7 @@
       weight: Liquids|Biomass
 
   - Liquids|Electricity:
-      description: synthetic liquid efuels ("power-to-liquid")
+      description: synthetic liquid efuels (power-to-liquid)
       weight: Liquids|Electricity
 
   - Liquids|Fossil:

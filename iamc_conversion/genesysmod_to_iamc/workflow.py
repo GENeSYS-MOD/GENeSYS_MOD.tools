@@ -26,7 +26,7 @@ def main(df: pyam.IamDataFrame) -> pyam.IamDataFrame:
 
     # import definitions and region-processor
     definition = DataStructureDefinition(here / "definitions", dimensions=dimensions)
-    processor = RegionProcessor.from_directory(path=here / "mappings")
+    processor = RegionProcessor.from_directory(here / "mappings",definition)
 
     # check if directional data exists in the scenario data, add to region codelist
     if any([r for r in df.region if ">" in r]):

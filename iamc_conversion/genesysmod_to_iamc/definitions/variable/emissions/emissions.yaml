@@ -4,7 +4,7 @@
 - Carbon Capture:
     description: total carbon dioxide emissions captured, i.e. captured CO2
      stream from bioenergy use, fossil fuel use, industrial processes, and
-     direct air capture; should be reported as positive numbers
+     direct air capture, should be reported as positive numbers
     unit: Mt CO2/yr
 - Carbon Capture|Biomass:
     description: total carbon dioxide emissions captured  from bioenergy use,
@@ -614,7 +614,7 @@
     unit: Mt CO/yr
 - Emissions|CO|Energy|Supply:
     description: Carbon monoxide emissions from Extraction and Distribution of Fossil
-      Fuels (including fugitive emissions, IPCC category 1B); Electricity production
+      Fuels (including fugitive emissions, IPCC category 1B), Electricity production
       and distribution, district heating and other energy conversion (e.g. refineries,
       synfuel production)
     unit: Mt CO/yr
@@ -736,7 +736,7 @@
     unit: Mt NH3/yr
 - Emissions|NH3|Energy|Supply:
     description: Ammonia Emissions from Extraction and Distribution of Fossil Fuels
-      (including fugitive Emissions, IPCC category 1B); Electricity production and
+      (including fugitive Emissions, IPCC category 1B), Electricity production and
       distribution, district heating and other energy conversion (e.g. refineries,
       synfuel production)
     unit: Mt NH3/yr
@@ -894,7 +894,7 @@
     unit: Mt VOC/yr
 - Emissions|VOC|Energy|Supply:
     description: Volatile organic compounds Emissions from Extraction and Distribution
-      of Fossil Fuels (including fugitive Emissions, IPCC category 1B); Electricity
+      of Fossil Fuels (including fugitive Emissions, IPCC category 1B), Electricity
       production and distribution, district heating and other energy conversion (e.g.
       refineries, synfuel production)
     unit: Mt VOC/yr
