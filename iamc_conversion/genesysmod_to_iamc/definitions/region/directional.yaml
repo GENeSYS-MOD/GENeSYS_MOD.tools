@@ -83,6 +83,7 @@
   - Germany>Sweden
   - Germany>Switzerland
   - Germany>The Netherlands
+  - Germany>United Kingdom
   - Greece>Bulgaria
   - Greece>Italy
   - Greece>North Macedonia
@@ -192,3 +193,10 @@
   - United Kingdom>Norway|Sorland
   - United Kingdom>Norway|Vestmidt
   - United Kingdom>The Netherlands
+  - United Kingdom>Germany
+  - Greece>Non-EU-Balkans
+  - Hungary>Non-EU-Balkans
+  - Italy>Non-EU-Balkans
+  - Non-EU-Balkans>Italy
+  - Norway>The Netherlands
+  - The Netherlands>Norway
