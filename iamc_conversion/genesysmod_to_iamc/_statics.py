@@ -81,11 +81,11 @@ DEF_MAP_SCENARIOS = {
     'DirectedTransition_globalLimit': 'Directed Transition 2.0',
     'GradualDevelopment_globalLimit': 'Gradual Development 2.0',
     'SocietalCommitment_globalLimit': 'Societal Commitment 2.0',
-    'Green_globalLimit': 'Go RES 0.9.1',
-    'NECPEssentials_globalLimit': 'NECP Essentials 0.9.1',
-    'REPowerEU_globalLimit': 'REPowerEU++ 0.9.1',
-    'Trinity_globalLimit': 'Trinity 0.9.1',
-    'GoRES_globalLimit': 'Go RES 0.9.1',
+    'Green_globalLimit': 'Go RES 1.0.1',
+    'NECPEssentials_globalLimit': 'NECP Essentials 1.0.1',
+    'REPowerEU_globalLimit': 'REPowerEU++ 1.0.1',
+    'Trinity_globalLimit': 'Trinity 1.0.1',
+    'GoRES_globalLimit': 'Go RES 1.0.1',
 }
 
 # define the list of files to use for the respective scenarios
@@ -94,10 +94,10 @@ DEF_MAP_FILE_SCENARIOS = {
     'DirectedTransition': 'Directed Transition 2.0',
     'GradualDevelopment': 'Gradual Development 2.0',
     'SocietalCommitment': 'Societal Commitment 2.0',
-    'GoRES': 'Go RES 0.9.1',
-    'NECPEssentials': 'NECP Essentials 0.9.1',
-    'REPowerEU++': 'REPowerEU++ 0.9.1',
-    'Trinity': 'Trinity 0.9.1'
+    'GoRES': 'Go RES 1.0.1',
+    'NECPEssentials': 'NECP Essentials 1.0.1',
+    'REPowerEU++': 'REPowerEU++ 1.0.1',
+    'Trinity': 'Trinity 1.0.1'
 }
 
 # define the years that should be included in the outputs
