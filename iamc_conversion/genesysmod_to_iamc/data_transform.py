@@ -257,13 +257,25 @@ def generate_capacity_values(data_wrapper: dw.DataWrapper):
 def generate_transmission_capacity_values(data_wrapper: dw.DataWrapper):
     logging.info('Executing: generate_transmission_capacity_values')
 
+    map_fuels = dr.loadmap_from_csv('fuels')
+
     trade_values = data_wrapper.trade_capacity_values.copy()
-    trade_values = trade_values[trade_values['type'] == 'Power Transmissions Capacity']
+    trade_values = trade_values[trade_values['type'] == 'Transmissions Capacity']
+    trade_values = trade_values[trade_values['fuel'].isin(['Power', 'H2', 'Gas_Natural'])]
     trade_values['model'] = DEF_MODEL_AND_VERSION
-    trade_values['unit'] = 'MW'
-    trade_values['value'] = abs(trade_values['value'])*1000
+
+    # transformation of power transmission
+    trade_values.loc[trade_values['fuel'] == 'Power', 'unit'] = 'MW'
+    trade_values.loc[trade_values['fuel'] == 'Power', 'value'] = abs(trade_values.loc[trade_values['fuel'] == 'Power', 'value'])*1000
+
+    # transformation of gas and hydrogen transmission
+    trade_values.loc[trade_values['fuel'].isin(['H2', 'Gas_Natural']), 'unit'] = 'GWh/h'
+    trade_values.loc[trade_values['fuel'].isin(['H2', 'Gas_Natural']), 'value'] = abs(trade_values.loc[trade_values['fuel'].isin(['H2', 'Gas_Natural']), 'value'])*1000/(3.6*8760)
+
+    for entry in map_fuels:
+        trade_values = trade_values.replace({'fuel': entry}, 'Network|' + map_fuels[entry] + '|Capacity')
+
     trade_values['subannual'] = 'Year'
-    trade_values['variable'] = 'Network|Electricity|Maximum Flow'
 
     trade_values['scenario'] = data_wrapper.capacity_values['scenario'][0]
     trade_values = _set_scenarios(trade_values)
@@ -283,11 +295,13 @@ def generate_transmission_capacity_values(data_wrapper: dw.DataWrapper):
     trade_values['region'] = trade_values['region_from'] + ">" + trade_values['region_to']
 
     trade_values = trade_values.groupby(
-        ['model', 'scenario', 'region', 'variable', 'unit', 'subannual', 'year'])['value'].sum().reset_index()
+        ['model', 'scenario', 'region', 'fuel', 'unit', 'subannual', 'year'])['value'].sum().reset_index()
     trade_values.columns = ['Model', 'Scenario', 'Region', 'Variable', 'Unit', 'Subannual', 'Year', 'Value']
 
 
     data_wrapper.transformed_data['transmission'] = trade_values
+
+    trade_values.to_csv('transmission_values.csv', index=False)
 
     return trade_values
 

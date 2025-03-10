@@ -58,6 +58,7 @@ DEF_DETAILED_COST_COLUMNS = ["region",
                               "value"]
 DEF_TRADE_CAPACITY_COLUMNS = ["region_from",
                               "region_to",
+                              "fuel",
                               "type",
                               "year",
                               "value"]
@@ -68,7 +69,7 @@ DEF_EMISSION_SHEET = 'output_emissions'
 DEF_COST_SHEET = 'output_costs'
 DEF_EXOGENOUS_COST_SHEET = 'output_exogenous_costs'
 DEF_DETAILED_COST_SHEET = 'output_technology_costs_detailed'
-DEF_TRADE_CAPACITY_SHEET = 'output_trade_capacity'
+DEF_TRADE_CAPACITY_SHEET = 'output_trade'
 
 # define the region name that is used for the aggregated outputs
 DEF_REGION_NAME = 'Europe (incl. Turkey)'

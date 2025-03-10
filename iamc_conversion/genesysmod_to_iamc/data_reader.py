@@ -105,7 +105,7 @@ def load_gdx_file(input_file, gams_dir):
 def load_csv_file(input_file):
     logging.info('Loading CSVs with output results')
     key_list = ['output_energy_balance', 'output_capacity', 'output_emissions', 'output_costs',
-                'output_exogenous_costs', 'output_technology_costs_detailed', 'output_trade_capacity']
+                'output_exogenous_costs', 'output_technology_costs_detailed', 'output_trade']
 
     output_csvs = OrderedDict()
 
