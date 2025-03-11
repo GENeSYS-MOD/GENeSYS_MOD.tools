@@ -301,8 +301,6 @@ def generate_transmission_capacity_values(data_wrapper: dw.DataWrapper):
 
     data_wrapper.transformed_data['transmission'] = trade_values
 
-    trade_values.to_csv('transmission_values.csv', index=False)
-
     return trade_values
 
 
