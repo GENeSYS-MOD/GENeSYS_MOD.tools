@@ -1,0 +1,29 @@
+Power,Electricity
+H2,Hydrogen
+Gas_Natural,Gas|Fossil
+Area_Rooftop_Commercial,Area Commercial Rooftop
+Area_Rooftop_Residential,Area Residential Rooftop
+Biomass,Biomass
+Hardcoal,Coal|Hard coal
+Nuclear,Nuclear
+Oil,Oil
+Mobility_Freight,Transportation|Freight
+Mobility_Passenger,Transportation|Passenger
+Lignite,Coal|Lignite
+Gas_Bio,Gas|Biomethane
+Gas_Synth,Gas|Synthetic Methane
+Heat_Buildings,Heat|Commercial and Residential
+Heat_Low_Industrial,Heat|Industrial
+Heat_Medium_Industrial,Heat|Industrial
+Heat_High_Industrial,Heat|Industrial
+Biofuel,Biofuel
+Powerfuel,E-Fuel
+LNG,LNG
+LBG,LBG
+LSG,LSG
+LH2,LH2
+Air,Air
+DAC_Dummy,DAC
+ETS,ETS|Buyer
+ETS_Source,ETS|Source
+Heat_District,Heat|District
