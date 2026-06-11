@@ -214,6 +214,25 @@ def get_coords(
 ########################################################
 ## help function to pivot, categorize and write files ##
 ########################################################
+def _site_categories(df_long):
+    """Per-coordinate inf/avg/opt label, same rule as pivot_and_categorize.
+
+    df_long has columns coords, capacity_factor, region. Each coordinate is
+    classified within its region by the annual-mean capacity factor: <= regional
+    30th percentile -> 'inf', >= 70th -> 'opt', else 'avg'. Returns a DataFrame
+    [coords, region, category]. Used to colour usable-site maps by site quality.
+    """
+    m = (df_long.groupby(["region", "coords"], as_index=False)["capacity_factor"]
+         .mean())
+    # per-region 30th/70th percentile thresholds, broadcast back to each row
+    g = m.groupby("region")["capacity_factor"]
+    q30 = g.transform(lambda s: s.quantile(0.30))
+    q70 = g.transform(lambda s: s.quantile(0.70))
+    m["category"] = np.where(m["capacity_factor"] <= q30, "inf",
+                             np.where(m["capacity_factor"] >= q70, "opt", "avg"))
+    return m[["coords", "region", "category"]]
+
+
 def pivot_and_categorize(
         df,
         tech,
@@ -336,7 +355,8 @@ def pv_capacity_factors(
         write_raw_data=False,
         output_dir='output/',
         tech_label='pv',
-        optimal_tilt=False
+        optimal_tilt=False,
+        return_categories=False
 ):
     start = timeit.timeit()
 
@@ -536,6 +556,9 @@ def pv_capacity_factors(
                                                       write_raw_data=write_raw_data,output_dir=output_dir,
                                                       out_tech=tech_label)
 
+        if return_categories:
+            # per-site inf/avg/opt label, for colouring usable-site maps
+            return df_inf, df_avg, df_opt, _site_categories(pv_df)
         if delete_vars == 0:
             return df_inf, df_avg, df_opt
         else:
@@ -563,7 +586,8 @@ def wind_onshore_capacity_factors(
         timeframe=None,
         filename=None,
         write_raw_data=False,
-        output_dir='output/'
+        output_dir='output/',
+        return_categories=False
 ):
 
     start = timeit.timeit()
@@ -597,6 +621,8 @@ def wind_onshore_capacity_factors(
 
     df_inf, df_avg, df_opt = pivot_and_categorize(wnd100, tech='wind_onshore', timeframe=timeframe, filename=filename, write_raw_data=write_raw_data,output_dir=output_dir)
 
+    if return_categories:
+        return df_inf, df_avg, df_opt, _site_categories(wnd100)
     if delete_vars == 0:
         return df_inf, df_avg, df_opt
     else:
@@ -1122,7 +1148,7 @@ def _quiet_rasterio(verbose=False):
         logger.setLevel(prev)
 
 
-def calculate_and_plot_available_area(admin=None,cutout=None,shapes=None,regions_name_en=None,excluder=None,verbose=False):
+def calculate_and_plot_available_area(admin=None,cutout=None,shapes=None,regions_name_en=None,excluder=None,verbose=False,color=None):
     gp = shapes.loc[shapes.index].geometry.to_crs(excluder.crs)
     excluder.open_files()
     with _quiet_rasterio(verbose):
@@ -1137,22 +1163,23 @@ def calculate_and_plot_available_area(admin=None,cutout=None,shapes=None,regions
     # falling back to 'dim_0' when unnamed. Read it from the result so plotting works
     # for any region set / workflow rather than assuming 'dim_0'.
     shape_dim = AvailablityMatrix.dims[0]
+    _cmap = _availability_cmap(color)
 
     if admin == 1:
-        fg = AvailablityMatrix.plot(row=shape_dim, col_wrap=3, cmap="Greens")
+        fg = AvailablityMatrix.plot(row=shape_dim, col_wrap=3, cmap=_cmap)
         fg.set_titles("{value}")
         for i, c in enumerate(shapes.index):
             shapes.plot(ax=fg.axs.flatten()[i], edgecolor="k", color="None")
     else:
         for c in AvailablityMatrix[shape_dim].values:
             fig, ax = plt.subplots()
-            AvailablityMatrix.sel({shape_dim: c}).plot(cmap="Greens")
+            AvailablityMatrix.sel({shape_dim: c}).plot(cmap=_cmap)
             shapes.loc[[c]].plot(ax=ax, edgecolor="k", color="None")
             cutout.grid.plot(ax=ax, color="None", edgecolor="grey", ls=":")
 
     return AvailablityMatrix
 
-def calculate_and_plot_available_rooftops(admin=None,cutout=None,shapes=None,regions_name_en=None,cities=None,verbose=False):
+def calculate_and_plot_available_rooftops(admin=None,cutout=None,shapes=None,regions_name_en=None,cities=None,verbose=False,color=None):
     rooftops = shapes.loc[shapes.index].geometry.to_crs(cities.crs)
     cities.open_files()
     with _quiet_rasterio(verbose):
@@ -1164,20 +1191,33 @@ def calculate_and_plot_available_rooftops(admin=None,cutout=None,shapes=None,reg
         AvailabilityMatrix_Rooftop = cutout.availabilitymatrix(shapes, cities)
 
     shape_dim = AvailabilityMatrix_Rooftop.dims[0]
+    _cmap = _availability_cmap(color)
 
     if admin == 1:
-        fg = AvailabilityMatrix_Rooftop.plot(row=shape_dim, col_wrap=3, cmap="Greens")
+        fg = AvailabilityMatrix_Rooftop.plot(row=shape_dim, col_wrap=3, cmap=_cmap)
         fg.set_titles("{value}")
         for i, c in enumerate(shapes.index):
             shapes.plot(ax=fg.axs.flatten()[i], edgecolor="k", color="None")
     else:
         for c in AvailabilityMatrix_Rooftop[shape_dim].values:
             fig, ax = plt.subplots()
-            AvailabilityMatrix_Rooftop.sel({shape_dim: c}).plot(cmap="Greens")
+            AvailabilityMatrix_Rooftop.sel({shape_dim: c}).plot(cmap=_cmap)
             shapes.loc[[c]].plot(ax=ax, edgecolor="k", color="None")
             cutout.grid.plot(ax=ax, color="None", edgecolor="grey", ls=":")
 
     return AvailabilityMatrix_Rooftop
+
+def _availability_cmap(color=None):
+    """Colormap for availability maps. None -> 'Greens'; a named matplotlib
+    colormap is used as-is; a single colour (e.g. hex '#004664') builds a
+    white->colour ramp so low availability stays white."""
+    if color is None:
+        return "Greens"
+    if color in plt.colormaps():
+        return color
+    from matplotlib.colors import LinearSegmentedColormap
+    return LinearSegmentedColormap.from_list("avail", ["white", color])
+
 
 def equal_area_crs(shapes):
     """Region-agnostic equal-area CRS: a Lambert Azimuthal Equal-Area projection
@@ -1190,7 +1230,7 @@ def equal_area_crs(shapes):
             "+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
 
 
-def calculate_capacity_potentials(cutout=None,coords_onshore=None,AvailabilityMatrix=None,AvailabilityMatrix_Rooftop=None,pv_cap_per_sqkm=100,pv_percent_land_available=0.03,wind_cap_per_sqkm=27,wind_percent_land_available=0.03,rooftop_cap_per_sqkm=100,rooftop_percent_area_available=0.2,area_crs=None):
+def calculate_capacity_potentials(cutout=None,coords_onshore=None,AvailabilityMatrix=None,AvailabilityMatrix_Rooftop=None,AvailabilityMatrix_Wind=None,pv_cap_per_sqkm=100,pv_percent_land_available=0.03,wind_cap_per_sqkm=27,wind_percent_land_available=0.03,rooftop_cap_per_sqkm=100,rooftop_percent_area_available=0.2,area_crs=None):
     area = cutout.grid.set_index(["y", "x"]).to_crs(area_crs or equal_area_crs(cutout.grid)).area / 1e6
     area.name = "Area [km²]"
     # The availability matrix is indexed by (shape, y, x); collapse to one value per
@@ -1201,15 +1241,23 @@ def calculate_capacity_potentials(cutout=None,coords_onshore=None,AvailabilityMa
                        .groupby(["y", "x"])["availability"].sum().reset_index())
     availability_rooftop_df = (AvailabilityMatrix_Rooftop.to_dataframe(name="availability rooftop")
                                .groupby(["y", "x"])["availability rooftop"].sum().reset_index())
+    # Wind can use a separate availability matrix (e.g. extra exclusions for onshore
+    # wind only). If none is given, wind reuses the PV/land availability.
+    if AvailabilityMatrix_Wind is not None:
+        availability_wind_df = (AvailabilityMatrix_Wind.to_dataframe(name="availability wind")
+                                .groupby(["y", "x"])["availability wind"].sum().reset_index())
+    else:
+        availability_wind_df = availability_df.rename(columns={"availability": "availability wind"})
     merged_df = availability_df.merge(coords_onshore, on=['y', 'x'], how='inner')
     merged_df = merged_df.merge(availability_rooftop_df, on=['y', 'x'], how='inner')
+    merged_df = merged_df.merge(availability_wind_df, on=['y', 'x'], how='inner')
     merged_df = merged_df.merge(area, on=['y', 'x'], how='inner')
 
     merged_df["Suitable Area PV [km²]"] = merged_df["Area [km²]"] * merged_df["availability"] * pv_percent_land_available
-    merged_df["Suitable Area Wind [km²]"] = merged_df["Area [km²]"] * merged_df["availability"] * wind_percent_land_available
+    merged_df["Suitable Area Wind [km²]"] = merged_df["Area [km²]"] * merged_df["availability wind"] * wind_percent_land_available
     merged_df["Suitable Area Rooftops [km²]"] = merged_df["Area [km²]"] * merged_df["availability rooftop"] * rooftop_percent_area_available
     merged_df["PV Capacity [GW]"] = merged_df["Area [km²]"] * merged_df["availability"] * pv_cap_per_sqkm * pv_percent_land_available / 1000
-    merged_df["Wind Capacity [GW]"] = merged_df["Area [km²]"] * merged_df["availability"] * wind_cap_per_sqkm * wind_percent_land_available / 1000
+    merged_df["Wind Capacity [GW]"] = merged_df["Area [km²]"] * merged_df["availability wind"] * wind_cap_per_sqkm * wind_percent_land_available / 1000
     merged_df["Rooftop Capacity [GW]"] = merged_df["Area [km²]"] * merged_df["availability rooftop"] * rooftop_cap_per_sqkm * rooftop_percent_area_available / 1000
 
     output_df = merged_df.groupby("region")[["Area [km²]","Suitable Area PV [km²]","Suitable Area Wind [km²]","Suitable Area Rooftops [km²]","PV Capacity [GW]","Rooftop Capacity [GW]","Wind Capacity [GW]"]].sum().reset_index()
@@ -1275,14 +1323,14 @@ def make_land_excluder(land_cover_raster, exclude_codes, crs=None, raster_crs=No
                        protected_layer=None, protected_buffer=0):
     """Build an excluder for utility-scale PV / onshore wind land availability.
 
-    land_cover_raster : categorical land-cover raster (e.g. NLCD, CORINE).
+    land_cover_raster : categorical land-cover raster (e.g. CORINE).
     exclude_codes     : raster values to mark UNavailable (your strict land list).
     crs               : analysis CRS; defaults to the raster's native CRS (fast,
                         no raster reprojection; national land-cover rasters are
                         usually already equal-area).
     protected_files   : path or list of paths to protected-area vector files.
     protected_query   : pandas query to pre-filter protected areas before excluding
-                        (e.g. "GAP_Sts in ['1','2']" for strict protection).
+                        (e.g. "IUCN_CAT in ['Ia','Ib','II']" for strict protection).
     protected_buffer  : buffer in CRS units (metres) around protected areas.
     """
     excluder = ExclusionContainer(crs=crs or raster_crs or _raster_crs(land_cover_raster))
@@ -1294,15 +1342,108 @@ def make_land_excluder(land_cover_raster, exclude_codes, crs=None, raster_crs=No
     if isinstance(files, (str, os.PathLike, gpd.GeoDataFrame)):
         files = [files]
     for pf in files:
-        if isinstance(pf, gpd.GeoDataFrame):
-            gdf = pf
-        elif protected_layer:
-            gdf = gpd.read_file(pf, layer=protected_layer)  # e.g. a layer in a GeoPackage
-        else:
-            gdf = gpd.read_file(pf)
-        if protected_query:
-            gdf = gdf.query(protected_query)
+        gdf = _load_vector(pf, layer=protected_layer if not isinstance(pf, gpd.GeoDataFrame) else None,
+                           query=protected_query)
         excluder.add_geometry(gdf, buffer=protected_buffer)
+    return excluder
+
+
+# Session cache for exclusion-layer vector reads. Big sources (national
+# protected-area databases can hold hundreds of thousands of features and take
+# tens of seconds per read) get re-read for every excluder build / scenario /
+# offshore exclusion; caching the FILTERED result by (path, layer, query) makes
+# repeats free while keeping memory bounded (only the subsets are kept).
+_VECTOR_CACHE = {}
+
+
+def _load_vector(src, layer=None, query=None):
+    """Read a vector source with an optional pandas query, cached per session.
+
+    src may be a path or an in-memory GeoDataFrame (returned filtered, uncached).
+    Call _VECTOR_CACHE.clear() to free memory or pick up changed files.
+    """
+    if isinstance(src, gpd.GeoDataFrame):
+        return src.query(query) if query else src
+    key = (str(src), layer, query)
+    if key in _VECTOR_CACHE:
+        return _VECTOR_CACHE[key]
+    gdf = gpd.read_file(src, layer=layer) if layer else gpd.read_file(src)
+    if query:
+        gdf = gdf.query(query)
+    _VECTOR_CACHE[key] = gdf
+    return gdf
+
+
+def ordinance_effective_bans(ordinance_file, hub_height_m, rotor_diameter_m,
+                             setback_threshold_m=1000,
+                             setback_feature_types=("Structures", "Property Line"),
+                             include_prohibitions=True, query=None):
+    """Municipalities whose wind ordinance is a de-facto ban, as exclusion geometries.
+
+    Local-ordinance layers in the reVX format store setbacks in mixed units (absolute metres,
+    or multiples of max-tip height / hub height / rotor diameter). This converts
+    every setback in `setback_feature_types` to metres using the given turbine
+    dimensions and flags a municipality as effectively banned when its setback (from
+    dwellings/structures or property lines) is >= setback_threshold_m - large
+    setbacks leave no buildable land in practice. Optionally unions in the formal
+    'Prohibitions' rows. Returns a GeoDataFrame of the affected polygons, ready for
+    add_geometry / add_exclusion_layers.
+
+    hub_height_m / rotor_diameter_m: turbine dims (max-tip = hub + rotor/2).
+    Region-agnostic; pass any reVX-format ordinance file.
+    """
+    g = _load_vector(ordinance_file, query=query)
+    max_tip = hub_height_m + rotor_diameter_m / 2.0
+
+    def _to_m(row):
+        val = pd.to_numeric(pd.Series([row.get("Value")]), errors="coerce").iloc[0]
+        if pd.isna(val):
+            # fall back to the explicit minimum-setback-distance column if present
+            return pd.to_numeric(pd.Series([row.get("Minimum Setback Distance")]),
+                                 errors="coerce").iloc[0]
+        vt = str(row.get("Value Type", ""))
+        if vt == "meters":
+            return val
+        if vt == "Max-tip Height Multiplier":
+            return val * max_tip
+        if vt == "Hub-height Multiplier":
+            return val * hub_height_m
+        if vt == "Rotor-Diameter Multiplier":
+            return val * rotor_diameter_m
+        return np.nan
+
+    sb = g[g["Feature Type"].isin(list(setback_feature_types))].copy()
+    if len(sb):
+        sb["setback_m"] = sb.apply(_to_m, axis=1)
+        effective = sb[sb["setback_m"] >= setback_threshold_m]
+    else:
+        effective = g.iloc[0:0]
+
+    parts = [effective]
+    if include_prohibitions:
+        parts.append(g[g["Feature Type"] == "Prohibitions"])
+    out = pd.concat(parts, ignore_index=True)
+    return gpd.GeoDataFrame(out, geometry="geometry", crs=g.crs)
+
+
+def add_exclusion_layers(excluder, layers):
+    """Append extra vector exclusion layers to an existing ExclusionContainer.
+
+    Region-agnostic. `layers` is a list of dicts, each describing one no-build
+    source with independent layer/query/buffer (unlike make_land_excluder which
+    applies one query to all files). Each dict:
+        {"file": path | GeoDataFrame,        # required
+         "layer": <layer name>,              # optional (gpkg / file-gdb)
+         "query": <pandas query str>,        # optional pre-filter
+         "buffer": <metres in excluder.crs>} # optional
+
+    Used e.g. to build a wind-only excluder = land excluder + additional
+    no-build areas (stricter protection classes, municipalities with a wind ban).
+    Returns the same excluder (mutated) for chaining.
+    """
+    for spec in (layers or []):
+        gdf = _load_vector(spec["file"], layer=spec.get("layer"), query=spec.get("query"))
+        excluder.add_geometry(gdf, buffer=spec.get("buffer", 0))
     return excluder
 
 
@@ -1363,18 +1504,53 @@ def calculate_offshore_potentials(cutout, coords_offshore,
     ].sum().reset_index()
 
 
+def _split_capacity_by_category(coords_cat, cutout, cap_per_sqkm, percent_available,
+                                tech_label, area_crs=None):
+    """Split an onshore capacity into inf/avg/opt categories per region.
+
+    coords_cat : usable coords with columns x, y, region, availability, category
+                 (the inf/avg/opt site-quality label, from the q30/q70 CF split).
+    Returns a wide DataFrame indexed by region with columns
+    '{tech_label} {cat} [GW]' for cat in inf/avg/opt plus '{tech_label} Total [GW]'.
+    Capacity per cell = cell_area * availability * cap_per_sqkm * percent_available
+    / 1000, then summed per region x category. Reuses the categories already
+    computed for the usable coords, so no extra capacity-factor run is needed.
+    """
+    if coords_cat is None or coords_cat.empty or "category" not in coords_cat.columns:
+        return None
+    area = (cutout.grid.set_index(["y", "x"])
+            .to_crs(area_crs or equal_area_crs(cutout.grid)).area / 1e6).rename("area_km2")
+    df = coords_cat.merge(area.reset_index(), on=["y", "x"], how="left")
+    df["cap_gw"] = (df["area_km2"] * df["availability"]
+                    * cap_per_sqkm * percent_available / 1000)
+    wide = df.pivot_table(index="region", columns="category", values="cap_gw",
+                          aggfunc="sum", observed=True)
+    # keep a consistent inf/avg/opt column order where present
+    order = [c for c in ["inf", "avg", "opt"] if c in wide.columns]
+    wide = wide[order] if order else wide
+    wide.columns = [f"{tech_label} {c} [GW]" for c in wide.columns]
+    wide[f"{tech_label} Total [GW]"] = wide.sum(axis=1)
+    return wide
+
+
 def calculate_potentials_per_region(cutout, geo_file, coords_onshore,
-                                    excluder, cities,
+                                    excluder, cities, wind_excluder=None,
                                     regions=None, region_col="region",
                                     pv_cap_per_sqkm=100, pv_percent_land_available=0.03,
                                     wind_cap_per_sqkm=27, wind_percent_land_available=0.03,
                                     rooftop_cap_per_sqkm=100, rooftop_percent_area_available=0.2,
                                     coords_offshore=None, usable_threshold=0.01,
                                     usable_threshold_rooftop=None, usable_round_to=2,
+                                    offshore_cap_per_sqkm=5,
+                                    offshore_percent_available=0.1,
                                     offshore_exclude_files=None, offshore_exclude_layer=None,
                                     offshore_exclude_query=None, offshore_exclude_buffer=0,
                                     area_crs=None, output_dir="output/", filename="",
-                                    plot=True, plot_cols=3, plot_size=3, verbose=False):
+                                    plot=True, plot_cols=3, plot_size=3, verbose=False,
+                                    color=None, matrix_cache=None,
+                                    add_category=True, pv_solar_panel=None, wind_turbine=None,
+                                    pv_slope=36.7, pv_azimuth=180, optimal_tilt=False,
+                                    rooftop_pv_slope=25, rooftop_pv_azimuth=180):
     """Memory-safe per-region GIS potentials with a stitched availability map.
 
     Processes one region at a time so atlite only ever rasterizes the land-cover
@@ -1404,34 +1580,56 @@ def calculate_potentials_per_region(cutout, geo_file, coords_onshore,
     shapes_all, names = get_region_shapes(geo_file, regions, region_col=region_col)
     os.makedirs(output_dir, exist_ok=True)
 
-    stitch_land = None      # running (y, x) sum across regions
+    stitch_land = None      # running (y, x) sum across regions (PV land)
+    stitch_wind = None      # running (y, x) sum across regions (wind land)
     stitch_roof = None
     per_region_tables = []
-    usable_onshore_parts = []   # usable land coords accumulated across regions
+    usable_onshore_parts = []   # usable PV land coords accumulated across regions
+    usable_wind_parts = []      # usable wind land coords accumulated across regions
     usable_rooftop_parts = []   # usable rooftop coords accumulated across regions
 
     for name in names:
         print(f"Processing region: {name}")
         shapes = shapes_all.loc[[name]]
 
-        # one-region availability; atlite crops the raster to this region's bounds
+        # one-region availability; atlite crops the raster to this region's bounds.
+        # 'land' is the PV/shared land matrix; 'wind' uses a separate excluder when
+        # given (e.g. extra exclusions that apply to onshore wind only, such as
+        # stricter protection classes or municipal wind bans), else it falls back
+        # to the same land matrix.
+        # matrix_cache (an externally supplied dict) reuses land/roof matrices across
+        # repeated calls with the same excluder/cities - e.g. scenario sweeps where
+        # only the wind excluder changes - skipping their recomputation entirely.
         with _quiet_rasterio(verbose):
-            land = cutout.availabilitymatrix(shapes, excluder, disable_progressbar=True)
-            roof = cutout.availabilitymatrix(shapes, cities, disable_progressbar=True)
+            if matrix_cache is not None and (name, "land") in matrix_cache:
+                land = matrix_cache[(name, "land")]
+                roof = matrix_cache[(name, "roof")]
+            else:
+                land = cutout.availabilitymatrix(shapes, excluder, disable_progressbar=True)
+                roof = cutout.availabilitymatrix(shapes, cities, disable_progressbar=True)
+                if matrix_cache is not None:
+                    matrix_cache[(name, "land")] = land
+                    matrix_cache[(name, "roof")] = roof
+            wind = (cutout.availabilitymatrix(shapes, wind_excluder, disable_progressbar=True)
+                    if wind_excluder is not None else land)
 
         # drop the singleton shape dimension -> (y, x) map for this region
         shape_dim = land.dims[0]
         land_yx = land.sum(shape_dim)
+        wind_yx = wind.sum(shape_dim)
         roof_yx = roof.sum(shape_dim)
         stitch_land = land_yx if stitch_land is None else stitch_land + land_yx
+        stitch_wind = wind_yx if stitch_wind is None else stitch_wind + wind_yx
         stitch_roof = roof_yx if stitch_roof is None else stitch_roof + roof_yx
 
-        # capacity potentials for just this region (reuses the existing function)
+        # capacity potentials for just this region (reuses the existing function).
+        # PV uses 'land', wind uses 'wind' (may differ); rooftop uses 'roof'.
         coords_region = coords_onshore[coords_onshore["region"] == name]
         if not coords_region.empty:
             region_df = calculate_capacity_potentials(
                 cutout=cutout, coords_onshore=coords_region,
                 AvailabilityMatrix=land, AvailabilityMatrix_Rooftop=roof,
+                AvailabilityMatrix_Wind=wind,
                 pv_cap_per_sqkm=pv_cap_per_sqkm, pv_percent_land_available=pv_percent_land_available,
                 wind_cap_per_sqkm=wind_cap_per_sqkm, wind_percent_land_available=wind_percent_land_available,
                 rooftop_cap_per_sqkm=rooftop_cap_per_sqkm, rooftop_percent_area_available=rooftop_percent_area_available,
@@ -1440,12 +1638,15 @@ def calculate_potentials_per_region(cutout, geo_file, coords_onshore,
             per_region_tables.append(region_df)
 
             # usable sites for this region (cells with developable area), for the
-            # capacity-factor timeseries on usable locations only. Land drives PV /
-            # onshore wind; rooftop matrix drives the rooftop-PV timeseries.
+            # capacity-factor timeseries on usable locations only. PV land, wind land
+            # (own excluder), and rooftop each get their own usable set.
             roof_thresh = (usable_threshold_rooftop if usable_threshold_rooftop
                            is not None else usable_threshold)
             usable_onshore_parts.append(
                 usable_onshore_coords(land, coords_region, threshold=usable_threshold,
+                                      round_to=usable_round_to))
+            usable_wind_parts.append(
+                usable_onshore_coords(wind, coords_region, threshold=usable_threshold,
                                       round_to=usable_round_to))
             usable_rooftop_parts.append(
                 usable_onshore_coords(roof, coords_region, threshold=roof_thresh,
@@ -1453,11 +1654,31 @@ def calculate_potentials_per_region(cutout, geo_file, coords_onshore,
 
         # free the per-region full matrices before the next region
         del land, roof, land_yx, roof_yx
+        if wind_excluder is not None:
+            del wind, wind_yx
         gc.collect()
 
     combined = (pd.concat(per_region_tables, ignore_index=True)
                 if per_region_tables else pd.DataFrame())
-    combined.to_csv(os.path.join(output_dir, f"{filename}_potentials_combined.csv"), index=False)
+
+    # Append offshore wind potential as extra columns (one per depth class) on the
+    # combined per-region table, so onshore + offshore live in one file.
+    if coords_offshore is not None and not combined.empty:
+        _off = calculate_offshore_potentials(
+            cutout, coords_offshore,
+            offshore_cap_per_sqkm=offshore_cap_per_sqkm,
+            offshore_percent_available=offshore_percent_available,
+            area_crs=area_crs)
+        if not _off.empty:
+            _wide = _off.pivot_table(index="region", columns="depth_class",
+                                     values="Offshore Wind Capacity [GW]",
+                                     aggfunc="sum", observed=True)
+            _wide.columns = [f"Offshore Wind {c} [GW]" for c in _wide.columns]
+            _wide["Offshore Wind Total [GW]"] = _wide.sum(axis=1)
+            combined = combined.merge(_wide.reset_index(), on="region", how="left")
+
+    # NOTE: the combined CSV is written later (after the inf/avg/opt category split is
+    # available), so PV and onshore-wind capacities can be broken out per category.
 
     if plot and stitch_land is not None:
         # cell areas (km²) on the stitched (y, x) grid, in an equal-area projection,
@@ -1471,19 +1692,25 @@ def calculate_potentials_per_region(cutout, geo_file, coords_onshore,
         # region outlines overlaid. Title shows the area-weighted mean availability
         # over covered cells (sum(availability*area) / sum(area)).
         from mpl_toolkits.axes_grid1 import make_axes_locatable
+        # colormap: 'color' lets the caller pick the high-availability colour (e.g.
+        # a hex like '#004664' -> white->colour ramp), or a named matplotlib colormap.
+        _cmap = _availability_cmap(color)
         # size the figure to the data's aspect so a wide, short map does not sit in a
         # square frame (which is what made the default colorbar look oversized).
         xext = float(stitch_land.x.max() - stitch_land.x.min())
         yext = float(stitch_land.y.max() - stitch_land.y.min())
         width = plot_size * plot_cols
         height = max(2.0, width * (yext / xext if xext else 1.0))
-        for label, stitched in [("Land (PV/wind)", stitch_land), ("Rooftop area", stitch_roof)]:
+        _maps = [("Land (PV)", stitch_land), ("Rooftop area", stitch_roof)]
+        if wind_excluder is not None:
+            _maps.insert(1, ("Land (wind)", stitch_wind))
+        for label, stitched in _maps:
             covered = stitched > 0
             w = area_da.where(covered)
             denom = float(w.sum())
             avg = float((stitched.where(covered) * w).sum() / denom) if denom > 0 else 0.0
             fig, ax = plt.subplots(figsize=(width, height))
-            im = stitched.plot(ax=ax, cmap="Greens", add_colorbar=False)
+            im = stitched.plot(ax=ax, cmap=_cmap, add_colorbar=False)
             shapes_all.boundary.plot(ax=ax, edgecolor="k", linewidth=0.5)
             # colorbar tied to the map axes -> same height as the chart, thin width
             cax = make_axes_locatable(ax).append_axes("right", size="3%", pad=0.1)
@@ -1492,23 +1719,89 @@ def calculate_potentials_per_region(cutout, geo_file, coords_onshore,
 
     coords_onshore_usable = (pd.concat(usable_onshore_parts, ignore_index=True)
                              if usable_onshore_parts else coords_onshore.iloc[0:0].copy())
-    coords_onshore_usable.to_csv(
-        os.path.join(output_dir, f"{filename}_coords_onshore_usable.csv"), index=False)
-
+    coords_wind_usable = (pd.concat(usable_wind_parts, ignore_index=True)
+                          if usable_wind_parts else coords_onshore.iloc[0:0].copy())
     coords_rooftop_usable = (pd.concat(usable_rooftop_parts, ignore_index=True)
                              if usable_rooftop_parts else coords_onshore.iloc[0:0].copy())
+
+    # Attach a site-quality 'category' (inf/avg/opt) per cell so the usable-coords
+    # CSVs carry it for later plotting/analysis. PV land + rooftop use the PV
+    # capacity factor; wind land uses the onshore-wind capacity factor. Same q30/q70
+    # split as the timeseries. CF outputs go to a temp dir so no extra files written.
+    if add_category and pv_solar_panel is not None and len(coords_onshore_usable):
+        import tempfile
+        _tmp = tempfile.mkdtemp()
+        *_drop, _on_cat = pv_capacity_factors(
+            cutout, coords_onshore_usable, pv_solar_panel,
+            pv_slope=pv_slope, pv_azimuth=pv_azimuth, optimal_tilt=optimal_tilt,
+            timeframe="catcalc", filename="_catcalc", output_dir=_tmp,
+            return_categories=True)
+        coords_onshore_usable = coords_onshore_usable.merge(
+            _on_cat[["coords", "category"]], on="coords", how="left")
+        if len(coords_rooftop_usable):
+            *_drop, _rf_cat = pv_capacity_factors(
+                cutout, coords_rooftop_usable, pv_solar_panel,
+                pv_slope=rooftop_pv_slope, pv_azimuth=rooftop_pv_azimuth,
+                timeframe="catcalc", filename="_catcalc", output_dir=_tmp,
+                tech_label="pv_rooftop", return_categories=True)
+            coords_rooftop_usable = coords_rooftop_usable.merge(
+                _rf_cat[["coords", "category"]], on="coords", how="left")
+    if add_category and wind_turbine is not None and len(coords_wind_usable):
+        import tempfile
+        _tmpw = tempfile.mkdtemp()
+        *_drop, _wd_cat = wind_onshore_capacity_factors(
+            cutout, coords_wind_usable, wind_turbine,
+            timeframe="catcalc", filename="_catcalc", output_dir=_tmpw,
+            return_categories=True)
+        coords_wind_usable = coords_wind_usable.merge(
+            _wd_cat[["coords", "category"]], on="coords", how="left")
+
+    # Split PV and onshore-wind potential into inf/avg/opt categories (q30/q70 site
+    # quality) and append as columns on the combined per-region table. Rooftop stays
+    # a single column (already in `combined`). Reuses the categories computed above.
+    if not combined.empty and "category" in coords_onshore_usable.columns:
+        _pv_split = _split_capacity_by_category(
+            coords_onshore_usable, cutout, pv_cap_per_sqkm, pv_percent_land_available,
+            "PV Capacity", area_crs=area_crs)
+        if _pv_split is not None:
+            combined = combined.merge(_pv_split.reset_index(), on="region", how="left")
+    # wind uses its own usable set (own excluder) if present, else the PV land set
+    _wind_cat_src = (coords_wind_usable if (wind_excluder is not None
+                     and "category" in coords_wind_usable.columns)
+                     else coords_onshore_usable)
+    if not combined.empty and "category" in _wind_cat_src.columns:
+        _wd_split = _split_capacity_by_category(
+            _wind_cat_src, cutout, wind_cap_per_sqkm, wind_percent_land_available,
+            "Wind Capacity", area_crs=area_crs)
+        if _wd_split is not None:
+            combined = combined.merge(_wd_split.reset_index(), on="region", how="left")
+
+    combined.to_csv(os.path.join(output_dir, f"{filename}_potentials_combined.csv"), index=False)
+
+    coords_onshore_usable.to_csv(
+        os.path.join(output_dir, f"{filename}_coords_onshore_usable.csv"), index=False)
     coords_rooftop_usable.to_csv(
         os.path.join(output_dir, f"{filename}_coords_rooftop_usable.csv"), index=False)
+    # Wind usable coords are written only when wind has its own excluder (else they
+    # equal the onshore/PV land set).
+    if wind_excluder is not None:
+        coords_wind_usable.to_csv(
+            os.path.join(output_dir, f"{filename}_coords_wind_usable.csv"), index=False)
 
     coords_offshore_usable = None
     if coords_offshore is not None:
+        # offshore 'category' = depth_class (its natural site class)
         coords_offshore_usable = usable_offshore_coords(
             coords_offshore, exclude_files=offshore_exclude_files,
             exclude_layer=offshore_exclude_layer, exclude_query=offshore_exclude_query,
             exclude_buffer=offshore_exclude_buffer)
+        if "depth_class" in coords_offshore_usable.columns:
+            coords_offshore_usable["category"] = coords_offshore_usable["depth_class"]
         coords_offshore_usable.to_csv(
             os.path.join(output_dir, f"{filename}_coords_offshore_usable.csv"), index=False)
 
+    # Return signature kept at 6 for back-compatibility; the wind usable set (when a
+    # separate wind_excluder is used) is written to {filename}_coords_wind_usable.csv.
     return (combined, stitch_land, stitch_roof,
             coords_onshore_usable, coords_rooftop_usable, coords_offshore_usable)
 
@@ -1565,12 +1858,22 @@ def _drop_points_in_geometries(df, exclude_files, exclude_layer=None,
                            crs="EPSG:4326")
     keep = pts
     for ef in files:
-        gdf = ef if isinstance(ef, gpd.GeoDataFrame) else (
-            gpd.read_file(ef, layer=exclude_layer) if exclude_layer
-            else gpd.read_file(ef))
-        if exclude_query:
-            gdf = gdf.query(exclude_query)
+        gdf = _load_vector(ef, layer=exclude_layer if not isinstance(ef, gpd.GeoDataFrame) else None,
+                           query=exclude_query)
         gdf = gdf.to_crs("EPSG:4326")
+        # Sanitize: invalid polygons give wrong point-in-polygon answers. Some
+        # datasets store antimeridian-crossing polygons as invalid bowties that
+        # falsely 'contain' most of the globe and silently wipe all offshore
+        # cells. Repair invalid geometries and drop antimeridian-wrap artifacts
+        # (lon span >= 180 deg).
+        gdf = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty].copy()
+        invalid = ~gdf.geometry.is_valid
+        if invalid.any():
+            gdf.loc[invalid, "geometry"] = gdf.loc[invalid, "geometry"].make_valid()
+        b = gdf.geometry.bounds
+        wrap = (b["maxx"] - b["minx"]) >= 180
+        if wrap.any():
+            gdf = gdf[~wrap]
         if exclude_buffer:
             # buffer in metres via an equal-area projection centred on the data
             aea = equal_area_crs(keep)
@@ -1589,8 +1892,8 @@ def usable_offshore_coords(coords_offshore, shallow_max=30, transitional_max=60,
     Two filters: (1) water depth within limits - keeps EEZ cells with
     0 < depth <= floating_max and tags depth_class (shallow / transitional / deep)
     matching the offshore timeseries; (2) optional exclusion of marine protected
-    areas / other no-build zones via exclude_files (any vector source; for the US,
-    the PAD-US 'PADUS4_1Marine' layer covers marine protected areas). Feed the
+    areas / other no-build zones via exclude_files (any vector source, e.g. a
+    WDPA subset or a national marine-protected-area layer). Feed the
     result into wind_offshore_capacity_factors. Region-agnostic - all exclusion
     inputs are passed in.
     """
@@ -1677,3 +1980,62 @@ def plot_offshore_map(coords_offshore, shapes=None, offshore_file=None,
 
 
 
+
+
+def plot_usable_coords(coords, shapes=None, boundary_file=None, color_by="availability",
+                       categories=None, title=None, size=8, point_size=6, cmap="viridis"):
+    """Map usable cells (onshore / rooftop / offshore) colour-coded.
+
+    Generic version of plot_offshore_map for any usable-coords frame returned by
+    the GIS step (coords_onshore_usable, coords_rooftop_usable, coords_offshore_usable).
+
+    coords        : DataFrame with x, y and the color_by column.
+    shapes        : optional region polygons drawn as grey outlines for context.
+    boundary_file : optional vector file (e.g. EEZ geojson) outlined in blue.
+    color_by      : column to colour by. Continuous (e.g. 'availability') -> colourbar;
+                    categorical (e.g. 'category', 'depth_class', 'region') -> legend.
+    categories    : optional [coords, category] DataFrame (from a CF function called
+                    with return_categories=True). Merged on 'coords' and used as the
+                    colour column; pass color_by='category' to colour inf/avg/opt.
+    title         : plot title (auto-generated if None).
+    """
+    import pandas as pd
+    df = coords.copy()
+    if categories is not None and "coords" in df.columns:
+        df = df.merge(categories[["coords", "category"]], on="coords", how="left")
+    if color_by not in df.columns:
+        # fall back to a sensible default per coord type
+        for alt in ("availability", "depth_class", "region"):
+            if alt in df.columns:
+                color_by = alt
+                break
+    pts = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df["x"], df["y"]),
+                           crs="EPSG:4326")
+
+    fig, ax = plt.subplots(figsize=(size, size))
+    if boundary_file is not None:
+        gpd.read_file(boundary_file).to_crs("EPSG:4326").boundary.plot(
+            ax=ax, edgecolor="steelblue", linewidth=0.6)
+    if shapes is not None:
+        shapes.to_crs("EPSG:4326").boundary.plot(ax=ax, edgecolor="grey", linewidth=0.5)
+
+    if color_by in pts.columns and pd.api.types.is_numeric_dtype(pts[color_by]):
+        pts.plot(ax=ax, column=color_by, cmap=cmap, markersize=point_size,
+                 legend=True, legend_kwds={"label": color_by, "shrink": 0.5})
+    elif color_by in pts.columns:
+        # fixed colour + order for the inf/avg/opt site quality classes
+        cat_colors = {"inf": "#d73027", "avg": "#fee090", "opt": "#1a9850"}
+        keys = (["inf", "avg", "opt"] if color_by == "category"
+                else sorted(pts[color_by].dropna().astype(str).unique()))
+        for key in keys:
+            grp = pts[pts[color_by].astype(str) == key]
+            if len(grp):
+                grp.plot(ax=ax, markersize=point_size, label=str(key),
+                         color=cat_colors.get(key))
+        ax.legend(title=color_by, fontsize=8)
+    else:
+        pts.plot(ax=ax, markersize=point_size)
+
+    ax.set_title(title or f"Usable cells ({len(pts)}) by {color_by}")
+    ax.set_xlabel("lon"); ax.set_ylabel("lat")
+    return ax
