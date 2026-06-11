@@ -3,7 +3,11 @@ iamc_conversion/genesysmod_to_iamc/__pycache__/
 iamc_conversion/.ipynb_checkpoints/
 iamc_conversion/genesysmod_to_iamc/out/
 iamc_conversion/genesysmod_to_iamc/input/
-GIS_&_Timeseries_Tool/geodata/
+GIS_&_Timeseries_Tool/geodata/*
+# keep the small example data so the example notebook runs out of the box
+!GIS_&_Timeseries_Tool/geodata/example_germany.geojson
+!GIS_&_Timeseries_Tool/geodata/example_germany_eez.geojson
+!GIS_&_Timeseries_Tool/geodata/example_germany_bathymetry.nc
 GIS_&_Timeseries_Tool/output
 GIS_&_Timeseries_Tool/__pycache__
 GIS_&_Timeseries_Tool/cutouts
