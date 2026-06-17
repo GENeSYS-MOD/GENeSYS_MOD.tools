@@ -11,3 +11,5 @@ GIS_&_Timeseries_Tool/geodata/*
 GIS_&_Timeseries_Tool/output
 GIS_&_Timeseries_Tool/__pycache__
 GIS_&_Timeseries_Tool/cutouts
+
+.DS_Store
