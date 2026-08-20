@@ -20,13 +20,22 @@ def iamc_conversion(data_folder_path, rename_mapping_technologies, rename_mappin
     # Create regions list
     regions = ["AT","BE","BG","CH","CZ","DE","DK","EE","ES","FI","FR","GR","HR","HU","IE","IT","LT","LU","LV","NL","NO","PL","PT","RO","SE","SI","SK","TR","UK","NONEU_Balkan","World"]
 
-    columns = ["Region", "Variable", "Unit", 2018, 2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060]
-    df_final_combined = pd.DataFrame(columns=[["Model", "Scenario", "Region", "Variable", "Unit", 2018, 2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060]])
+    year_cols = [2018, 2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060]
+    base_cols = ["Region", "Variable", "Unit"]
+    out_cols = ["Model", "Scenario", "Region", "Variable", "Unit"] + year_cols
+
+    combined_frames = []
 
     # List all items in the data folder
     files = os.listdir(data_folder_path)
     for file in files:
+        print("Processing file {}".format(file))
         file_path = os.path.join(data_folder_path, file)
+
+        if not os.path.isfile(file_path):
+            continue
+        if not file.lower().endswith((".xlsx", ".xlsm", ".xls")):
+            continue
 
         excel_file = pd.ExcelFile(file_path)
 
@@ -592,17 +601,29 @@ def iamc_conversion(data_folder_path, rename_mapping_technologies, rename_mappin
                 print(f'Successfully converted {item}')
 
 
-            scenario = file.partition(".")[0]
-            df_final["Model"] = "GENeSYS-MOD 4.0"
-            df_final["Scenario"] = scenario + " v1.1.0"
-            second = df_final.pop("Scenario")
-            first = df_final.pop("Model")
-            df_final.insert(0, 'Scenario', second)
-            df_final.insert(0, 'Model', first)
-            #df_final.drop(columns=[2020], axis=1)
-            df_final["Region"] = df_final["Region"].replace(rename_mapping_regions)
-            df_final.reset_index()
-            df_final.to_csv("./Output/"+scenario+".csv")
+        scenario = file.partition(".")[0]
+        df_final["Model"] = "GENeSYS-MOD 4.0"
+        df_final["Scenario"] = scenario + " v1.4.0"
+
+
+        second = df_final.pop("Scenario")
+        first = df_final.pop("Model")
+        df_final.insert(0, 'Scenario', second)
+        df_final.insert(0, 'Model', first)
+        #df_final.drop(columns=[2020], axis=1)
+        df_final["Region"] = df_final["Region"].replace(rename_mapping_regions)
+        df_final.reset_index()
+        df_final.to_csv("./Output/"+scenario+".csv")
+
+        combined_frames.append(df_final)
+
+    if combined_frames:
+        df_combined = pd.concat(combined_frames, ignore_index=True)
+
+        # optional: sort to keep it neat
+        df_combined = df_combined.sort_values(["Scenario", "Region", "Variable", "Unit"], kind="stable")
+
+        df_combined.to_csv("./Output/combined_all_scenarios.csv", index=False)
 
 
 

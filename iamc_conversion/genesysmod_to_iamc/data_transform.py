@@ -142,6 +142,7 @@ def generate_final_energy_values(data_wrapper: dw.DataWrapper):
     use_values['techfuel'] = use_values['technology'] + '|' + use_values['fuel']
     use_values['fuel'] = use_values['techfuel']
 
+    display(use_values)
 
 
     use_electricity_values = data_wrapper.usage_values.copy()
@@ -276,8 +277,8 @@ def generate_transmission_capacity_values(data_wrapper: dw.DataWrapper):
 
     fuel_to_unit = {
         'Power': 'MW',
-        'Gas_Natural': 'GW',
-        'H2': 'GW'
+        'Gas_Natural': 'TJ',
+        'H2': 'TJ'
     }
 
     trade_values['unit'] = trade_values['fuel'].map(fuel_to_unit)
@@ -472,15 +473,27 @@ def generate_secondary_energy(data_wrapper: dw.DataWrapper):
     power_values['unit'] = 'EJ/yr'
 
     map_secondary_energy_heat = dr.loadmap_from_csv('secondary_energy_heat')
-    heat_values = prod_values[prod_values['technology'].isin(map_secondary_energy_heat.keys())].copy()
+    heat_values = prod_values.copy()
+
+    display(heat_values[heat_values['fuel'] == 'Heat_Low_Industrial'])
     heat_values = heat_values[(heat_values['fuel'] == 'Heat_Buildings') |
                               (heat_values['fuel'] == 'Heat_Low_Industrial') |
                               (heat_values['fuel'] == 'Heat_MediumLow_Industrial') |
                               (heat_values['fuel'] == 'Heat_MediumHigh_Industrial') |
                               (heat_values['fuel'] == 'Heat_High_Industrial')]
+
+    #rename X_Convert_HD technologies, so they can be correctly assigned to their sector
+    mask_hd = heat_values["technology"].eq("X_Convert_HD")
+
+    display(heat_values.loc[mask_hd & heat_values["fuel"].eq("Heat_Low_Industrial"), "technology"])
+    heat_values.loc[mask_hd & heat_values["fuel"].eq("Heat_Low_Industrial"), "technology"] = "X_Convert_HD_HLI"
+    heat_values.loc[mask_hd & heat_values["fuel"].eq("Heat_Buildings"), "technology"] = "X_Convert_HD_HB"
+
+    heat_values = heat_values[heat_values["technology"].isin(map_secondary_energy_heat.keys())].copy()
+
     for entry in map_secondary_energy_heat:
         heat_values = heat_values.replace({'technology': entry},
-                                          'Secondary Energy|Heat|' + map_secondary_energy_heat[entry])
+                                          'Secondary Energy|' + map_secondary_energy_heat[entry])
     heat_values['unit'] = 'EJ/yr'
 
     # map_secondary_energy_transport = dr.loadmap_from_csv('secondary_energy_transport')

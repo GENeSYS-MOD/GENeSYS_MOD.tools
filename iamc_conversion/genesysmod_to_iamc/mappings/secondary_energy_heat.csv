@@ -39,7 +39,6 @@ HB_Heatpump_Ground,Residential and Commercial|Electricity|Heat Pump|Ground Sourc
 HB_Lignite,Residential and Commercial|Coal|Lignite|w/o CCS
 HB_Oil_Boiler,Residential and Commercial|Oil
 HB_Solar_Thermal,Residential and Commercial|Solar
-HB_Convert_DH,Residential and Commercial|Other
 HMHI_Biomass,Industry|Biomass
 HMHI_Gas,Industry|Gas
 HMHI_Gas_CCS,Industry|Gas
@@ -50,3 +49,5 @@ HMHI_Steam_Electric,Industry|Other
 HLI_Convert_DH,Industry|Other
 HMHI_H2,Industry|Hydrogen
 HMLI_Heatpump,Industry|Electricity
+X_Convert_HD_HLI,Industry|Heat
+X_Convert_HD_HB,Residential and Commercial|Heat

@@ -15,6 +15,7 @@
           and storage (CCS)
     - Gas|OCGT|w/o CCS:
         description: heat from gas in a open cycle gas turbine without carbon capture and storage (CCS)
+
     - Oil:
         description: heating with oil
     - Coal:
@@ -64,6 +65,8 @@
     - Biomethane:
         description: heating with biomethane (produced from biomass)
 
-
+    - Heat:
+        description: centralized heat (district heat)
+        
     - Other:
         description: other heat source
