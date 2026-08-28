@@ -28,6 +28,7 @@ import logging
 import warnings
 import timeit
 import gc
+from shapely.geometry import box
 
 warnings.simplefilter('ignore')
 logging.captureWarnings(False)
@@ -127,7 +128,7 @@ def _get_coords_custom(cutout, regions, gdf_polygons, offshore_file, bathymetry_
 def get_coords(
         cutout,
         regions,
-        geo_file,
+        geo_file = None,
         admin=0,
         offshore_file=None,
         bathymetry_file=None
@@ -356,7 +357,8 @@ def pv_capacity_factors(
         output_dir='output/',
         tech_label='pv',
         optimal_tilt=False,
-        return_categories=False
+        return_categories=False,
+        return_raw_df=False
 ):
     start = timeit.timeit()
 
@@ -408,8 +410,8 @@ def pv_capacity_factors(
                                                    a_min=-1, a_max=1))
 
             azimuth_difference = np.where(abs(rotation) < (pi / 2),
-                                  azimuth_difference,
-                                  -azimuth_difference + np.sign(rotation) * pi)
+                                          azimuth_difference,
+                                          -azimuth_difference + np.sign(rotation) * pi)
 
             # handle pv_slope=0 case:
             azimuth_difference = np.where(sin(pv_slope) != 0, azimuth_difference, (pi / 2))
@@ -550,6 +552,9 @@ def pv_capacity_factors(
     pv_df = pv_df[['time', 'coords', 'capacity_factor', 'region']]
     pv_df['capacity_factor'] = round(pv_df['capacity_factor'], 4)
 
+    if return_raw_df:
+        return pv_df
+
     if tracking ==None:
 
         df_inf, df_avg, df_opt = pivot_and_categorize(pv_df, tech='pv', timeframe=timeframe, filename=filename,
@@ -587,13 +592,14 @@ def wind_onshore_capacity_factors(
         filename=None,
         write_raw_data=False,
         output_dir='output/',
-        return_categories=False
+        return_categories=False,
+        return_raw_df=False
 ):
 
     start = timeit.timeit()
 
     wnd100 = cutout.data[['wnd100m', 'roughness']].to_dataframe().reset_index()
-    wnd100.drop(columns=['lon', 'lat'], inplace=True)
+    wnd100.drop(columns=['lon', 'lat'], inplace=True, errors='ignore')
     wnd100.rename(columns={'wnd100m': 'u100', 'roughness': 'z'}, inplace=True)
     wnd100 = wnd100[(wnd100['x'].isin(coords['x'])) & (wnd100['y'].isin(coords['y']))]
 
@@ -619,6 +625,9 @@ def wind_onshore_capacity_factors(
     wnd100 = wnd100[['time', 'coords', 'capacity_factor', 'region']]
     #wnd100 = wnd100.rename(columns={'iso_a2': 'region'})
 
+    if return_raw_df:
+        return wnd100
+
     df_inf, df_avg, df_opt = pivot_and_categorize(wnd100, tech='wind_onshore', timeframe=timeframe, filename=filename, write_raw_data=write_raw_data,output_dir=output_dir)
 
     if return_categories:
@@ -640,13 +649,14 @@ def wind_offshore_capacity_factors(
         timeframe=None,
         filename=None,
         write_raw_data=False,
-        output_dir='output/'
+        output_dir='output/',
+        return_raw_df=False
 ):
 
     start = timeit.timeit()
 
     wnd100 = cutout.data[['wnd100m', 'roughness']].to_dataframe().reset_index()
-    wnd100.drop(columns=['lon', 'lat'], inplace=True)
+    wnd100.drop(columns=['lon', 'lat'], inplace=True, errors='ignore')
     wnd100.rename(columns={'wnd100m': 'u100', 'roughness': 'z'}, inplace=True)
     wnd100 = wnd100[(wnd100['x'].isin(coords['x'])) & (wnd100['y'].isin(coords['y']))]
 
@@ -675,6 +685,9 @@ def wind_offshore_capacity_factors(
         keep.insert(4, 'depth')
     wnd100 = wnd100[keep]
 
+    if return_raw_df:
+        return wnd100
+
     df_shallow, df_transitional, df_deep = pivot_and_categorize(wnd100, tech='wind_offshore', timeframe=timeframe, filename=filename,write_raw_data=write_raw_data,output_dir=output_dir)
 
     if delete_vars == 0:
@@ -695,14 +708,15 @@ def temperature_timeseries(
         timeframe=None,
         filename=None,
         write_raw_data=False,
-        output_dir='output/'
+        output_dir='output/',
+        return_raw_dfs=False
 ):
 
     start = timeit.timeit()
 
     temp = cutout.data['temperature'].to_dataframe().reset_index()
     
-    temp.drop(columns=['lon', 'lat'], inplace=True)
+    temp.drop(columns=['lon', 'lat'], inplace=True, errors='ignore')
     
     temp = temp[(temp['x'].isin(coords['x'])) & (temp['y'].isin(coords['y']))]
     
@@ -714,6 +728,24 @@ def temperature_timeseries(
     temp = pd.merge(temp, coords, on=['x', 'y'])
     
     temp = temp[['time','coords','temperature','heatpump_cop','region']]
+
+    soil_temp = cutout.data['soil temperature'].to_dataframe().reset_index()
+    
+    soil_temp.drop(columns=['lon', 'lat'], inplace=True, errors='ignore')
+    
+    soil_temp = soil_temp[(soil_temp['x'].isin(coords['x'])) & (soil_temp['y'].isin(coords['y']))]
+    
+    vorlauftemp = 55+273.15
+    soil_temp['heatpump_cop'] = 1/(vorlauftemp/(vorlauftemp-soil_temp['soil temperature']))
+    
+    soil_temp['soil temperature'] = round(soil_temp['soil temperature']-273.15,2)
+    
+    soil_temp = pd.merge(soil_temp, coords, on=['x', 'y'])
+    
+    soil_temp = soil_temp[['time','coords','soil temperature','heatpump_cop','region']]
+
+    if return_raw_dfs:
+        return temp, soil_temp
    
     df_temp = pd.pivot_table(temp, values='temperature', index='time', columns='region', aggfunc=np.mean).copy()
     
@@ -742,21 +774,6 @@ def temperature_timeseries(
     
     df_heatpump_cop.to_csv(output_dir+'/'+timeframe+'_heatpump_cop_'+filename+'.csv', index=True)
     
-    soil_temp = cutout.data['soil temperature'].to_dataframe().reset_index()
-    
-    soil_temp.drop(columns=['lon', 'lat'], inplace=True)
-    
-    soil_temp = soil_temp[(soil_temp['x'].isin(coords['x'])) & (soil_temp['y'].isin(coords['y']))]
-    
-    vorlauftemp = 55+273.15
-    soil_temp['heatpump_cop'] = 1/(vorlauftemp/(vorlauftemp-soil_temp['soil temperature']))
-    
-    soil_temp['soil temperature'] = round(soil_temp['soil temperature']-273.15,2)
-    
-    soil_temp = pd.merge(soil_temp, coords, on=['x', 'y'])
-    
-    soil_temp = soil_temp[['time','coords','soil temperature','heatpump_cop','region']]
-    
     df_heatpump_ground_cop = pd.pivot_table(soil_temp, values='heatpump_cop', index='time', columns='region', aggfunc=np.mean).copy()
     
     df_heatpump_ground_cop.to_csv(output_dir+'/'+timeframe+'_heatpump_ground_cop_'+filename+'.csv', index=True)
@@ -771,6 +788,99 @@ def temperature_timeseries(
     print(end - start)
     return
 
+## hydro run-of-river capacity factors ##
+def compute_regional_runoff_volume(cutout, geo_file=None, shapes=None):
+    """Computes hourly aggregated runoff volume (m^3) for a given region."""
+    if "runoff" not in cutout.data.data_vars and "ro" not in cutout.data.data_vars:
+        print("Runoff variable missing in cutout. Preparing 'runoff' feature...")
+        cutout.prepare(features=["runoff"])
+        
+    var_name = "runoff" if "runoff" in cutout.data.data_vars else "ro"
+
+    if shapes is None:
+        if geo_file is None:
+            raise ValueError("Must provide either geo_file or shapes to compute runoff volume.")
+        shapes = gpd.read_file(geo_file)
+        
+    gdf_region = shapes.to_crs("EPSG:4326")
+    geom_union = gdf_region.union_all()
+
+    lons, lats = np.meshgrid(cutout.data.x.values, cutout.data.y.values)
+    pts = gpd.GeoSeries(gpd.points_from_xy(lons.flatten(), lats.flatten()), crs="EPSG:4326")
+    inside_mask = pts.intersects(geom_union).values.reshape(len(cutout.data.y), len(cutout.data.x))
+
+    mask_da = xr.DataArray(
+        inside_mask.astype(float),
+        coords={"y": cutout.data.y, "x": cutout.data.x},
+        dims=["y", "x"]
+    )
+
+    if inside_mask.sum() == 0:
+        print("Warning: No grid cells matched geometry for runoff calculation.")
+        return pd.Series(0.0, index=cutout.data.indexes["time"])
+
+    # Cell area calculation (m^2 per grid cell)
+    dx = float(np.abs(cutout.data.x[1] - cutout.data.x[0])) if len(cutout.data.x) > 1 else 0.25
+    dy = float(np.abs(cutout.data.y[1] - cutout.data.y[0])) if len(cutout.data.y) > 1 else 0.25
+    lat_rad = np.deg2rad(cutout.data.y)
+    cell_area_m2 = (dx * 111320.0 * np.cos(lat_rad)) * (dy * 110574.0)
+    area_da = cell_area_m2.broadcast_like(mask_da)
+
+    # Runoff volume (m^3) = depth (m) * area (m^2)
+    da_runoff = cutout.data[var_name]
+    hourly_volume = (da_runoff * mask_da * area_da).sum(dim=["x", "y"]).to_pandas()
+    return hourly_volume
+
+def hydro_ror_capacity_factors(
+        cutout=None,
+        geo_file=None,
+        shapes=None,
+        raw_volume=None,
+        timeframe=None,
+        filename=None,
+        output_dir='output/',
+        smoothing_window=48,
+        percentile_sizing=95,
+        return_raw_volume=False
+):
+    start = timeit.timeit()
+    
+    if raw_volume is None:
+        if cutout is None:
+            raise ValueError("Must provide either cutout or raw_volume to hydro_ror_capacity_factors.")
+        hourly_volume = compute_regional_runoff_volume(cutout, geo_file=geo_file, shapes=shapes)
+    else:
+        hourly_volume = raw_volume
+
+    if return_raw_volume:
+        return hourly_volume
+
+    # 48-hour moving average filter for hydraulic catchment lag
+    smooth_series = (
+        hourly_volume
+        .rolling(window=smoothing_window, min_periods=1, center=True)
+        .mean()
+        .values
+    )
+
+    # 95th percentile sizing normalization
+    p95 = np.percentile(smooth_series, percentile_sizing)
+
+    if p95 > 0:
+        ror_cf = np.clip(smooth_series / p95, a_min=0.0, a_max=1.0)
+    else:
+        ror_cf = np.zeros_like(smooth_series)
+
+    df_ror = pd.DataFrame(
+        {filename: np.round(ror_cf, 4)},
+        index=hourly_volume.index
+    )
+
+    csv_out = os.path.join(output_dir, f"{timeframe}_hydro_ror_{filename}.csv")
+    df_ror.to_csv(csv_out, index=True)
+    
+    end = timeit.timeit()
+    return df_ror
 
 def create_output_folder(timeframe):
     current_folder = os.getcwd()
@@ -936,7 +1046,7 @@ if getattr(_era5.retrieve_data, "__name__", "") != "_retrieve_data_cached":
 # Used to estimate the total number of downloaded data points.
 _CUTOUT_VARS = ('height', 'wnd100m', 'roughness', 'influx_toa', 'influx_direct',
                 'influx_diffuse', 'albedo', 'solar_altitude', 'solar_azimuth',
-                'temperature', 'soil temperature')
+                'temperature', 'soil temperature','runoff')
 
 
 def _determine_cutout_bounds(regions=None, geo_file=None, cutout_north_west=None,
@@ -1024,7 +1134,7 @@ def _cutout_has_data(ds, var="temperature"):
     return bool(np.isfinite(sample).any())
 
 
-def get_cutout(filename, timeframe, module="era5", regions=None, geo_file=None, cutout_north_west=None, cutout_south_east=None, dx=0.25, dy=0.25, folder="cutouts/", natural_earth_dataset="admin_0_map_units"):
+def get_cutout(filename, timeframe, module="era5", regions=None, geo_file=None, cutout_north_west=None, cutout_south_east=None, dx=0.25, dy=0.25, folder="cutouts/", natural_earth_dataset="admin_0_map_units", monthly_requests=None, concurrent_requests=None):
     dir = folder+filename+"_"+timeframe+"_"+str(int(dx*100))+"_"+str(int(dy*100))
     print(dir)
 
@@ -1071,7 +1181,13 @@ def get_cutout(filename, timeframe, module="era5", regions=None, geo_file=None, 
                            dy=dy,
                            time=timeframe)
 
-    cutout.prepare(['height', 'wind', 'influx', 'temperature'])
+    prepare_kwargs = {}
+    if monthly_requests is not None:
+        prepare_kwargs['monthly_requests'] = monthly_requests
+    if concurrent_requests is not None:
+        prepare_kwargs['concurrent_requests'] = concurrent_requests
+
+    cutout.prepare(['height', 'wind', 'influx', 'temperature','runoff'], **prepare_kwargs)
     return cutout
 
 
@@ -1326,11 +1442,11 @@ def make_land_excluder(land_cover_raster, exclude_codes, crs=None, raster_crs=No
     land_cover_raster : categorical land-cover raster (e.g. CORINE).
     exclude_codes     : raster values to mark UNavailable (your strict land list).
     crs               : analysis CRS; defaults to the raster's native CRS (fast,
-                        no raster reprojection; national land-cover rasters are
-                        usually already equal-area).
+                         no raster reprojection; national land-cover rasters are
+                         usually already equal-area).
     protected_files   : path or list of paths to protected-area vector files.
     protected_query   : pandas query to pre-filter protected areas before excluding
-                        (e.g. "IUCN_CAT in ['Ia','Ib','II']" for strict protection).
+                         (e.g. "IUCN_CAT in ['Ia','Ib','II']" for strict protection).
     protected_buffer  : buffer in CRS units (metres) around protected areas.
     """
     excluder = ExclusionContainer(crs=crs or raster_crs or _raster_crs(land_cover_raster))
@@ -1947,40 +2063,6 @@ def plot_offshore_map(coords_offshore, shapes=None, offshore_file=None,
         pts.plot(ax=ax, markersize=point_size)
     ax.set_title(f"Usable offshore cells by {color_by}")
     return ax
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 def plot_usable_coords(coords, shapes=None, boundary_file=None, color_by="availability",
                        categories=None, title=None, size=8, point_size=6, cmap="viridis"):
