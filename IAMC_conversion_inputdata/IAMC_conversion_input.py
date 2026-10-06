@@ -602,8 +602,8 @@ def iamc_conversion(data_folder_path, rename_mapping_technologies, rename_mappin
 
 
         scenario = file.partition(".")[0]
-        df_final["Model"] = "GENeSYS-MOD 4.0"
-        df_final["Scenario"] = scenario + " v1.4.0"
+        df_final["Model"] = "GENeSYS-MOD 4.1"
+        df_final["Scenario"] = scenario + " v2.0"
 
 
         second = df_final.pop("Scenario")

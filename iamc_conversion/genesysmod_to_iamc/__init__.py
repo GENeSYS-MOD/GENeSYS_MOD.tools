@@ -25,10 +25,10 @@ class Pathways(Enum):
 #    DT = "DirectedTransition"
 #    GD = "GradualDevelopment"
 #    SC = "SocietalCommitment"
-    GR = "GoRES"
+    GR = "Go RES"
     RE = "REPowerEU++"
-    NE = "NECPEssentials"
-    TR = "Trinity"
+    NE = "NECP Essentials"
+    TR = "EU Trinity"
 
 
 def generate_data(input_file: str, file_type: str = "gdx", generate_series_data: bool = False, generate_load_factors: bool = False, generate_transmission_data: bool = False,
