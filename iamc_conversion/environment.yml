@@ -1,0 +1,20 @@
+# Environment for the GENeSYS-MOD to IAMC converter and its validation (Python 3.11 or newer is needed for the
+# current nomenclature-iamc, which the scenario explorers use to check uploads).
+# Create it with:      conda env create -f environment.yml
+# then activate it:   conda activate genesysmod-iamc
+# Before an upload, bring the check up to the explorer's version:  pip install -U nomenclature-iamc pyam-iamc
+name: genesysmod-iamc
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - ipykernel
+  - pip:
+      - nomenclature-iamc>=0.32.1
+      - pyam-iamc>=4.0
+      - gdxpds>=4.0
+      - gdxcc==8.33.2.post1
+      - gitpython
+      - openpyxl
+      - pyyaml

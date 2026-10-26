@@ -59,8 +59,6 @@ def loaddf_from_csv(file):
     filename = file + ".csv"
     return pd.read_csv(DEF_MAPPINGS_PATH / filename, header=0)
 
-definition_dir = Path(__file__).parent / 'definitions'
-
 def loadmap_iso2_countries():
     with open(Path(__file__).parent / 'mappings' / 'GENeSYS-MOD 4.0.yaml', 'r') as stream:
         country_codelist = yaml.load(stream, Loader=yaml.FullLoader)

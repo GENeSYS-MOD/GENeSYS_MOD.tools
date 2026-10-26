@@ -10,6 +10,12 @@ DEF_OUTPUT_PATH = Path(__file__).parent / 'out'
 # define the model version that is used for the output files
 DEF_MODEL_AND_VERSION = 'GENeSYS-MOD 4.1'
 
+# define the scenario explorer whose upload check is used to validate the outputs (see validation.py):
+# the url of that project's workflow repository, usually https://github.com/iiasa/<project>-workflow
+DEF_WORKFLOW_REPO_URL = 'https://github.com/iiasa/idesignres-workflow'
+# folder outside this repository where the workflow repository is kept and updated before every check
+DEF_WORKFLOW_CACHE_DIR = Path.home() / '.genesysmod_to_iamc'
+
 
 DEF_PRODUCTION_COLUMNS = ["region",
                           "sector",

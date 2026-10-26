@@ -5,17 +5,13 @@ import genesysmod_to_iamc.data_reader as dr
 import genesysmod_to_iamc.data_transform as dt
 import genesysmod_to_iamc.series_generator as sg
 
-import nomenclature
 import pyam
-from genesysmod_to_iamc.workflow import main as workflow
+from genesysmod_to_iamc.validation import validate, update_workflow_repo
 
 
 import logging
 import os
 import time
-
-definition_dir = Path(__file__).parent / 'definitions'
-definition = nomenclature.DataStructureDefinition(definition_dir, dimensions=["variable"])
 
 
 logging.basicConfig(level=logging.INFO)
@@ -57,7 +53,9 @@ def generate_data(input_file: str, file_type: str = "gdx", generate_series_data:
         _combine_data(input_file, generate_series_data, generate_load_factors)
 
 
-def generate_combined_excel_yearly():
+def generate_combined_excel_yearly(run_validation: bool = True):
+    """Combine all *_yearly.csv outputs into one Excel file and, by default, validate it with the
+    scenario explorer workflow (see validation.py). Returns the path of the Excel file."""
     lst = []
 
     for filename in os.listdir(DEF_OUTPUT_PATH):
@@ -68,7 +66,13 @@ def generate_combined_excel_yearly():
     genesys = pyam.concat(lst)
     genesys = pyam.IamDataFrame(genesys.data[pyam.IAMC_IDX + ['year', 'value']])
     timestr = time.strftime("%d-%m-%Y")
-    genesys.to_excel(DEF_OUTPUT_PATH / 'combined_excel' / f'GENeSYS-MOD-pathways_{timestr}.xlsx')
+    excel_file = DEF_OUTPUT_PATH / 'combined_excel' / f'GENeSYS-MOD-pathways_{timestr}.xlsx'
+    excel_file.parent.mkdir(parents=True, exist_ok=True)
+    genesys.to_excel(excel_file)
+
+    if run_validation:
+        validate(excel_file)
+    return excel_file
 
 
 def _generate_yearly_values(input_file, file_type: str = "gdx", generate_transmission_data: bool = False):
@@ -94,10 +98,6 @@ def _generate_yearly_values(input_file, file_type: str = "gdx", generate_transmi
 
     data_wrapper.generate_idataframe(True)
 
-    df = workflow(pyam.IamDataFrame(data_wrapper.idataframe))
-    #df = pyam.IamDataFrame(data_wrapper.idataframe)
-
-    definition.validate(df)
     return data_wrapper
 
 
