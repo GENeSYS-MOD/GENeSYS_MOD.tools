@@ -26,7 +26,8 @@ class DataWrapper(object):
         self.init_time_slices()
 
         self.input_file = input_file
-        self.hourly_data_excel = None
+        # scenario name in the outputs; set from config.yaml when the results are loaded
+        self.scenario = input_file
 
         self.idataframe = None
 
@@ -45,10 +46,6 @@ class DataWrapper(object):
         _raw_emission_values: pd.DataFrame = self._output[DEF_EMISSION_SHEET]
         _raw_emission_values.columns = DEF_EMISSION_COLUMNS
         self.emission_values = _raw_emission_values
-
-        _raw_capacity_values: pd.DataFrame = self._output[DEF_CAPACITY_SHEET]
-        _raw_capacity_values.columns = DEF_CAPACITY_COLUMNS
-        self.capacity_values = _raw_capacity_values
 
         _raw_capacity_values: pd.DataFrame = self._output[DEF_CAPACITY_SHEET]
         _raw_capacity_values.columns = DEF_CAPACITY_COLUMNS

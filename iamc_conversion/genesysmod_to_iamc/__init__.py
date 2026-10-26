@@ -1,5 +1,13 @@
+"""Conversion of GENeSYS-MOD results to the IAMC format of the scenario explorers.
+
+All settings are in config.yaml (in the folder above this package).
+
+    import genesysmod_to_iamc
+    genesysmod_to_iamc.run()                           # all scenarios of config.yaml, combined and validated
+    genesysmod_to_iamc.generate_data('Go RES')         # one scenario only
+    genesysmod_to_iamc.validate('path/to/file.xlsx')   # check an existing IAMC file
+"""
 from genesysmod_to_iamc._statics import *
-from enum import Enum
 
 import genesysmod_to_iamc.data_reader as dr
 import genesysmod_to_iamc.data_transform as dt
@@ -16,19 +24,25 @@ import time
 
 logging.basicConfig(level=logging.INFO)
 
-class Pathways(Enum):
-#    TF = "TechnoFriendly"
-#    DT = "DirectedTransition"
-#    GD = "GradualDevelopment"
-#    SC = "SocietalCommitment"
-    GR = "Go RES"
-    RE = "REPowerEU++"
-    NE = "NECP Essentials"
-    TR = "EU Trinity"
+
+def run():
+    """Convert all scenarios of config.yaml, combine their yearly values in one Excel file and validate it.
+    Returns the path of the Excel file."""
+    for scenario in DEF_SCENARIOS:
+        generate_data(scenario['file'])
+    return generate_combined_excel_yearly(files=[scenario['file'] + '_yearly.csv' for scenario in DEF_SCENARIOS])
 
 
-def generate_data(input_file: str, file_type: str = "gdx", generate_series_data: bool = False, generate_load_factors: bool = False, generate_transmission_data: bool = False,
-                  combine_outputs: bool = False):
+def generate_data(input_file: str, file_type: str = None, generate_series_data: bool = None,
+                  generate_load_factors: bool = None, generate_transmission_data: bool = None,
+                  combine_outputs: bool = None):
+    """Convert one result file (name without extension, in the input folder). Arguments that are left out are
+    taken from config.yaml."""
+    file_type = file_type or DEF_FILE_TYPE
+    generate_series_data = _option(generate_series_data, 'hourly_series')
+    generate_load_factors = _option(generate_load_factors, 'load_factors')
+    generate_transmission_data = _option(generate_transmission_data, 'transmission')
+    combine_outputs = _option(combine_outputs, 'combine')
 
     if file_type != "gdx" and file_type != "csv":
         raise Exception("Error: 'file_type' must be one of 'csv' or 'gdx'")
@@ -42,6 +56,8 @@ def generate_data(input_file: str, file_type: str = "gdx", generate_series_data:
     data_wrapper.idataframe.to_csv(DEF_OUTPUT_PATH / output_name)
 
     if generate_series_data:
+        # the hourly profiles come from Timeseries_<input_file>.xlsx, which only the series need
+        dt.generate_load_demand_series(data_wrapper, input_file)
         _generate_series_data(data_wrapper)
 
     if generate_load_factors:
@@ -53,46 +69,61 @@ def generate_data(input_file: str, file_type: str = "gdx", generate_series_data:
         _combine_data(input_file, generate_series_data, generate_load_factors)
 
 
-def generate_combined_excel_yearly(run_validation: bool = True):
-    """Combine all *_yearly.csv outputs into one Excel file and, by default, validate it with the
-    scenario explorer workflow (see validation.py). Returns the path of the Excel file."""
-    lst = []
-
-    for filename in os.listdir(DEF_OUTPUT_PATH):
-        if filename.endswith("_yearly.csv"):
-            df = pyam.IamDataFrame(str(DEF_OUTPUT_PATH / filename))
-            lst.append(df)
+def generate_combined_excel_yearly(run_validation: bool = None, files: list = None):
+    """Combine *_yearly.csv outputs (the given file names, or all in the output folder) into one Excel file and
+    validate it with the scenario explorer workflow (see validation.py). Returns the path of the Excel file."""
+    if files is None:
+        files = [filename for filename in os.listdir(DEF_OUTPUT_PATH) if filename.endswith("_yearly.csv")]
+    lst = [pyam.IamDataFrame(str(DEF_OUTPUT_PATH / filename)) for filename in files]
 
     genesys = pyam.concat(lst)
     genesys = pyam.IamDataFrame(genesys.data[pyam.IAMC_IDX + ['year', 'value']])
-    timestr = time.strftime("%d-%m-%Y")
-    excel_file = DEF_OUTPUT_PATH / 'combined_excel' / f'GENeSYS-MOD-pathways_{timestr}.xlsx'
+    name = DEF_COMBINED_FILE.format(date=time.strftime("%d-%m-%Y"), release=DEF_RELEASE)
+    excel_file = DEF_OUTPUT_PATH / 'combined_excel' / name
     excel_file.parent.mkdir(parents=True, exist_ok=True)
     genesys.to_excel(excel_file)
 
-    if run_validation:
+    if DEF_RUN_VALIDATION if run_validation is None else run_validation:
         validate(excel_file)
     return excel_file
 
 
-def _generate_yearly_values(input_file, file_type: str = "gdx", generate_transmission_data: bool = False):
+def _option(value, key):
+    """An argument of the functions above, or the setting of the same name in config.yaml if it is left out."""
+    return DEF_OUTPUTS.get(key, False) if value is None else value
+
+
+def _scenario_name(input_file):
+    """Scenario name in the outputs: the name config.yaml gives this file (else the file name) and the release."""
+    name = next((scenario['name'] for scenario in DEF_SCENARIOS if scenario['file'] == input_file), input_file)
+    return f'{name} {DEF_RELEASE}'.strip()
+
+
+def _load_results(input_file, file_type):
     if file_type == "gdx":
         data_wrapper = dr.load_gdx_file(input_file, DEF_GAMS_DIR)
     elif file_type == "csv":
         data_wrapper = dr.load_csv_file(input_file)
+    data_wrapper.scenario = _scenario_name(input_file)
+    return data_wrapper
+
+
+def _generate_yearly_values(input_file, file_type: str = "gdx", generate_transmission_data: bool = False):
+    data_wrapper = _load_results(input_file, file_type)
 
     if generate_transmission_data == True:
         dt.generate_transmission_capacity_values(data_wrapper)
-    dt.generate_load_demand_series(data_wrapper, input_file)
     dt.generate_primary_energy_values(data_wrapper)
     dt.generate_final_energy_values(data_wrapper)
     dt.generate_capacity_values(data_wrapper)
     dt.generate_transport_capacity_values(data_wrapper)
     dt.generate_storage_capacity_values(data_wrapper)
     dt.generate_emissions_values(data_wrapper)
-#    dt.generate_additional_emissions_values(data_wrapper)
+    if _option(None, 'additional_emissions'):
+        dt.generate_additional_emissions_values(data_wrapper)
     dt.generate_secondary_energy(data_wrapper)
-    #dt.generate_exogenous_costs(data_wrapper)
+    if _option(None, 'exogenous_costs'):
+        dt.generate_exogenous_costs(data_wrapper)
     dt.generate_detailed_costs(data_wrapper)
     dt.generate_co2_prices(data_wrapper)
 
@@ -102,14 +133,10 @@ def _generate_yearly_values(input_file, file_type: str = "gdx", generate_transmi
 
 
 def _generate_load_factors(input_file, file_type: str = "gdx"):
-    if file_type == "gdx":
-        data_wrapper_series = dr.load_gdx_file(input_file, DEF_GAMS_DIR)
-    elif file_type == "csv":
-        data_wrapper_series = dr.load_csv_file(input_file)
+    data_wrapper_series = _load_results(input_file, file_type)
 
     dt.generate_load_factors(data_wrapper_series, input_file)
     data_wrapper_series.generate_idataframe_renewable_series()
-    #nomenclature.DataStructureDefinition.validate(df=data_wrapper_series.idataframe)
     return data_wrapper_series
 
 

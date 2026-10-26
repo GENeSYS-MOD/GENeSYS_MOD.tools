@@ -1,20 +1,42 @@
+import os
 from pathlib import Path
 
-# add your GAMS directory name here
-DEF_GAMS_DIR = "C:/GAMS/46"
+import yaml
+
+# settings that change between releases or projects are read from config.yaml (one folder above this package);
+# another settings file can be used by setting the environment variable GENESYSMOD_IAMC_CONFIG
+CONFIG_FILE = Path(os.environ.get('GENESYSMOD_IAMC_CONFIG', Path(__file__).parents[1] / 'config.yaml'))
+with open(CONFIG_FILE, encoding='utf-8') as _file:
+    CONFIG = yaml.safe_load(_file)
+
+
+def _folder(path):
+    """A folder from the settings; relative paths are relative to the settings file."""
+    path = Path(os.path.expanduser(path))
+    return path if path.is_absolute() else CONFIG_FILE.parent / path
+
+
+DEF_GAMS_DIR = CONFIG['gams_dir']
 
 DEF_MAPPINGS_PATH = Path(__file__).parent / 'mappings'
-DEF_INPUT_PATH = Path(__file__).parent / 'input'
-DEF_OUTPUT_PATH = Path(__file__).parent / 'out'
+DEF_INPUT_PATH = _folder(CONFIG['input_dir'])
+DEF_OUTPUT_PATH = _folder(CONFIG['output_dir'])
 
-# define the model version that is used for the output files
-DEF_MODEL_AND_VERSION = 'GENeSYS-MOD 4.1'
+DEF_MODEL_AND_VERSION = CONFIG['model']
+DEF_RELEASE = CONFIG.get('release') or ''
+DEF_YEARS = CONFIG['years']
+DEF_FILE_TYPE = CONFIG['file_type']
+DEF_SCENARIOS = CONFIG['scenarios']
+DEF_OUTPUTS = CONFIG['outputs']
+DEF_COMBINED_FILE = CONFIG['combined_file']
 
-# define the scenario explorer whose upload check is used to validate the outputs (see validation.py):
-# the url of that project's workflow repository, usually https://github.com/iiasa/<project>-workflow
-DEF_WORKFLOW_REPO_URL = 'https://github.com/iiasa/idesignres-workflow'
-# folder outside this repository where the workflow repository is kept and updated before every check
-DEF_WORKFLOW_CACHE_DIR = Path.home() / '.genesysmod_to_iamc'
+DEF_REGION_NAME = CONFIG['regions']['total']
+DEF_EU27_NAME = CONFIG['regions']['eu27']
+
+# scenario explorer whose upload check is used to validate the outputs (see validation.py)
+DEF_RUN_VALIDATION = CONFIG['validation']['run']
+DEF_WORKFLOW_REPO_URL = CONFIG['validation']['workflow_repo']
+DEF_WORKFLOW_CACHE_DIR = _folder(CONFIG['validation']['cache_dir'])
 
 
 DEF_PRODUCTION_COLUMNS = ["region",
@@ -43,13 +65,6 @@ DEF_CAPACITY_COLUMNS = ["region",
                         "scenario",
                         "year",
                         "value"]
-DEF_COST_COLUMNS = ["region",
-                    "sector",
-                    "technology",
-                    "type",
-                    "scenario",
-                    "year",
-                    "value"]
 DEF_EXOGENOUS_COST_COLUMNS = ["region",
                               "technology",
                               "type",
@@ -72,44 +87,23 @@ DEF_TRADE_CAPACITY_COLUMNS = ["region_from",
 DEF_PRODUCTION_SHEET = 'output_energy_balance'
 DEF_CAPACITY_SHEET = 'output_capacity'
 DEF_EMISSION_SHEET = 'output_emissions'
-DEF_COST_SHEET = 'output_costs'
 DEF_EXOGENOUS_COST_SHEET = 'output_exogenous_costs'
 DEF_DETAILED_COST_SHEET = 'output_technology_costs_detailed'
 DEF_TRADE_CAPACITY_SHEET = 'output_trade'
 
-# define the region name that is used for the aggregated outputs
-DEF_REGION_NAME = 'Europe (incl. Turkey)'
-
-
-# define the list of scenarios and map them to the IAMC explorer format
-DEF_MAP_SCENARIOS = {
-    'TechnoFriendly_globalLimit': 'Techno-Friendly 2.0',
-    'DirectedVision_globalLimit': 'Directed Transition 2.0',
-    'DirectedTransition_globalLimit': 'Directed Transition 2.0',
-    'GradualDevelopment_globalLimit': 'Gradual Development 2.0',
-    'SocietalCommitment_globalLimit': 'Societal Commitment 2.0',
-    'Green_globalLimit': 'Go RES v2.0',
-    'NECPEssentials_globalLimit': 'NECP Essentials v2.0',
-    'REPowerEU_globalLimit': 'REPowerEU++ v2.0',
-    'Trinity_globalLimit': 'EU Trinity v2.0',
-    'GoRES_globalLimit': 'Go RES v2.0',
+# result tables of the Julia version (files <table>_<region>_<pathway>_<scenario>_<run>.csv, written with
+# switch_processed_results = 1) and the gdx names under which the converter reads them
+DEF_CSV_TABLES = {
+    'output_production': DEF_PRODUCTION_SHEET,
+    'output_capacity': DEF_CAPACITY_SHEET,
+    'output_emission': DEF_EMISSION_SHEET,
+    'output_exogenous_costs': DEF_EXOGENOUS_COST_SHEET,
+    'output_technology_costs_detailed': DEF_DETAILED_COST_SHEET,
+    'output_trade': DEF_TRADE_CAPACITY_SHEET,
 }
 
-# define the list of files to use for the respective scenarios
-DEF_MAP_FILE_SCENARIOS = {
-    'TechnoFriendly': 'Techno-Friendly 2.0',
-    'DirectedTransition': 'Directed Transition 2.0',
-    'GradualDevelopment': 'Gradual Development 2.0',
-    'SocietalCommitment': 'Societal Commitment 2.0',
-    'GoRES': 'Go RES v2.0',
-    'NECPEssentials': 'NECP Essentials v2.0',
-    'REPowerEU++': 'REPowerEU++ v2.0',
-    'Trinity': 'EU Trinity v2.0'
-}
-
-# define the years that should be included in the outputs
-#DEF_YEARS = [2018, 2020, 2025, 2030, 2035, 2040, 2045, 2050]
-DEF_YEARS = [2018, 2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060]
-
+# EU member states among the model regions (Malta and Cyprus are not modelled), and the regions that add up to
+# the total over all model regions (DEF_REGION_NAME)
 DEF_EU27 = ['AT', 'BE', 'BG', 'HR', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT',
-                                     'LV', 'LT', 'LU', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE']
+            'LV', 'LT', 'LU', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE']
+DEF_TOTAL_SUBREGIONS = [DEF_EU27_NAME, 'NO', 'NONEU_Balkan', 'TR', 'UK', 'CH']

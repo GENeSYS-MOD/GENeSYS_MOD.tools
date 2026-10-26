@@ -30,7 +30,7 @@ def generate_idataframe(data_wrapper, filter_only_yearly_values=False):
                              , 'Primary Energy|Ocean'
                              , 'Primary Energy|Geothermal'
                              , 'Primary Energy|Hydro'], append=True, recursive=False)
-    idataframe.aggregate_region(variable='Primary Energy*', subregions=['EU27 (excl. Malta & Cyprus)','NO','NONEU_Balkan','TR','UK','CH'], append=True)
+    idataframe.aggregate_region(variable='Primary Energy*', subregions=DEF_TOTAL_SUBREGIONS, append=True)
 
     idataframe.aggregate(variable='Final Energy|Industry|Liquids', append=True, recursive=False)
     idataframe.aggregate(variable='Final Energy|Industry|Solids', append=True, recursive=False)
@@ -117,7 +117,7 @@ def generate_idataframe(data_wrapper, filter_only_yearly_values=False):
     #                     components=['Final Energy|Residential and Commercial'], append=True, recursive=False)
 
 
-    idataframe.aggregate_region(variable='Final Energy*', subregions=['EU27 (excl. Malta & Cyprus)','NO','NONEU_Balkan','TR','UK','CH'], append=True)
+    idataframe.aggregate_region(variable='Final Energy*', subregions=DEF_TOTAL_SUBREGIONS, append=True)
 
     idataframe.aggregate(variable='Final Energy|Solar',
                          components=['Primary Energy|Solar'], append=True, recursive=False)
@@ -158,16 +158,16 @@ def generate_idataframe(data_wrapper, filter_only_yearly_values=False):
     idataframe.aggregate(variable='Capacity|Heat|Industry|Coal|Lignite', append=True, recursive=False)
     idataframe.aggregate(variable='Capacity|Heat|Industry|Coal', append=True, recursive=False)
     idataframe.aggregate(variable='Capacity|Heat|Industry', append=True, recursive=False)
-    idataframe.aggregate_region(variable='Capacity|*', subregions=['EU27 (excl. Malta & Cyprus)','NO','NONEU_Balkan','TR','UK','CH'], append=True)
+    idataframe.aggregate_region(variable='Capacity|*', subregions=DEF_TOTAL_SUBREGIONS, append=True)
 
     #idataframe.aggregate(variable='Maximum Storage|Electricity', append=True, recursive=False)
-    idataframe.aggregate_region(variable='Maximum Storage|Electricity*', subregions=['EU27 (excl. Malta & Cyprus)','NO','NONEU_Balkan','TR','UK','CH'], append=True)
+    idataframe.aggregate_region(variable='Maximum Storage|Electricity*', subregions=DEF_TOTAL_SUBREGIONS, append=True)
 
 
     idataframe.aggregate(variable='Emissions|CO2|Energy|Supply', append=True, recursive=False)
     idataframe.aggregate(variable='Emissions|CO2|Energy|Demand', append=True, recursive=False)
     idataframe.aggregate(variable='Emissions|CO2|Energy', append=True, recursive=False)
-    idataframe.aggregate_region(variable='Emissions|CO2|*', subregions=['EU27 (excl. Malta & Cyprus)','NO','NONEU_Balkan','TR','UK','CH'], append=True)
+    idataframe.aggregate_region(variable='Emissions|CO2|*', subregions=DEF_TOTAL_SUBREGIONS, append=True)
 
 
     # idataframe.aggregate(variable='Energy Service|Transportation|Freight|Road|Internal Combustion Engine', append=True, recursive=False)
@@ -182,7 +182,7 @@ def generate_idataframe(data_wrapper, filter_only_yearly_values=False):
     # idataframe.aggregate(variable='Energy Service|Transportation|Passenger|Air', append=True, recursive=False)
     # idataframe.aggregate(variable='Energy Service|Transportation|Passenger|Rail', append=True, recursive=False)
     # idataframe.aggregate(variable='Energy Service|Transportation|Passenger', append=True, recursive=False)
-    # idataframe.aggregate_region(variable='Energy Service|Transportation|*', subregions=['EU27 (excl. Malta & Cyprus)','NO','NONEU_Balkan','TR','UK','CH'], append=True)
+    # idataframe.aggregate_region(variable='Energy Service|Transportation|*', subregions=DEF_TOTAL_SUBREGIONS, append=True)
 
 
     idataframe.aggregate(variable='Secondary Energy|Electricity|Biomass', append=True, recursive=False)
@@ -212,7 +212,7 @@ def generate_idataframe(data_wrapper, filter_only_yearly_values=False):
                              , 'Secondary Energy|Electricity|Gas|w/o CCS'], append=True, recursive=False)
 
     idataframe.aggregate(variable='Secondary Energy|Electricity', append=True, recursive=False)
-    idataframe.aggregate_region(variable='Secondary Energy|*', subregions=['EU27 (excl. Malta & Cyprus)','NO','NONEU_Balkan','TR','UK','CH'], append=True)
+    idataframe.aggregate_region(variable='Secondary Energy|*', subregions=DEF_TOTAL_SUBREGIONS, append=True)
 
 
     # idataframe.aggregate_region(variable='Capital Cost|*', append=True)
@@ -220,13 +220,10 @@ def generate_idataframe(data_wrapper, filter_only_yearly_values=False):
     # idataframe.aggregate_region(variable='Variable Cost|*', append=True)
 
 
-    #idataframe = pyam.IamDataFrame(idataframe.data.replace({'region': 'UK'}, 'GB'))
-
     iso2_mapping = dr.loadmap_iso2_countries()
 
     for r in iso2_mapping:
         idataframe.rename(region={r: iso2_mapping[r]}, inplace=True)
-        #idataframe = pyam.IamDataFrame(idataframe.data.replace({'region': r}, iso2_mapping[r]))
 
     idataframe = pyam.IamDataFrame(idataframe.data.replace({'region': 'World'}, DEF_REGION_NAME))
     idataframe.rename(region={'NONEU_Balkan': 'Non-EU-Balkans'}, inplace=True)
@@ -235,11 +232,6 @@ def generate_idataframe(data_wrapper, filter_only_yearly_values=False):
         idataframe.filter(subannual='Year', inplace=True)
 
 
-    # test = idataframe[idataframe['region'].all('Germany')]
-    # test = test.groupby(['model', 'scenario', 'variable', 'unit', 'subannual', 'year']).sum().reset_index()
-    # test['region'] = 'test'
-    #
-    # idataframe = pd.concat([idataframe, test])
 
 
     return idataframe

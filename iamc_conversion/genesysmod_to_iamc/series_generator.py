@@ -13,15 +13,13 @@ def generate_final_energy_series(data_wrapper: dw.DataWrapper, series_name: str,
     _filtered = _finalenergy_demand.as_pandas()[_finalenergy_demand['subannual'] == 'Year']
     _filtered = _filtered[_filtered['variable'] == fuel_name]
     _filtered = _filtered.groupby(['region', 'year'])['value'].sum().reset_index()
-    _filtered.head(10)
 
     for year in DEF_YEARS:
         _series = data_wrapper.demand_series[series_name].copy()
         _series['unit'] = 'EJ/yr'
         _series['model'] = DEF_MODEL_AND_VERSION
         _series['fuel'] = fuel_name
-        _series['scenario'] = data_wrapper.capacity_values['scenario'][0]
-        _series = dt._set_scenarios(_series)
+        _series = dt._set_scenarios(_series, data_wrapper)
         _series['year'] = year
         # group by relevant values and take the sum
         _frame = _series.groupby(
@@ -35,8 +33,6 @@ def generate_final_energy_series(data_wrapper: dw.DataWrapper, series_name: str,
     for year in DEF_YEARS:
         for region in regions:
             _yearly = _filtered.copy()
-            #if region == 'UK':
-            #    region = 'GB'
             if region == 'NONEU_Balkan':
                 region_key = 'Non-EU-Balkans'
             elif region == 'UK':
@@ -66,7 +62,7 @@ def generate_final_energy_series(data_wrapper: dw.DataWrapper, series_name: str,
 
     data_wrapper.output_series[fuel_name] = output_frame
 
-    output_frame.to_csv(series_name + ".csv")
+    output_frame.to_csv(DEF_OUTPUT_PATH / (series_name + ".csv"))
     return output_frame
 
 

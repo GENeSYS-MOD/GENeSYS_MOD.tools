@@ -1,0 +1,57 @@
+# Settings of the GENeSYS-MOD to IAMC conversion: everything that changes between releases or projects.
+# The converter reads this file when it is imported. To use another settings file, set the environment
+# variable GENESYSMOD_IAMC_CONFIG to its path.
+
+# GAMS installation, used to read the gdx result files
+gams_dir: C:/GAMS/46
+
+# folders, relative to this file. input holds the results: <file>.gdx of the GAMS version, or the csv files of the
+# Julia version whose names contain <file>; Timeseries_<file>.xlsx is only needed for hourly series and load factors
+input_dir: genesysmod_to_iamc/input
+output_dir: genesysmod_to_iamc/out
+
+# model name and release as they appear in the outputs (scenario "Go RES v2.0", model "GENeSYS-MOD 4.1")
+model: GENeSYS-MOD 4.1
+release: v2.0
+
+# years of the hourly series and load factors (the yearly values cover all years in the results)
+years: [2018, 2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060]
+
+# type of the result files: gdx (GAMS version) or csv (Julia version)
+file_type: gdx
+
+# scenarios to convert: result file name without extension (for csv results the run name in the file names),
+# and the scenario name in the outputs
+scenarios:
+  - file: Go RES
+    name: Go RES
+  - file: REPowerEU++
+    name: REPowerEU++
+  - file: NECP Essentials
+    name: NECP Essentials
+  - file: EU Trinity
+    name: EU Trinity
+
+# what to convert
+outputs:
+  transmission: true            # network capacities between regions (Network|...|Capacity)
+  hourly_series: false          # hourly demand series, in an extra file (large)
+  load_factors: false           # hourly load factors of PV, wind and run-of-river, in an extra file
+  combine: true                 # per scenario, one csv with the yearly values and the extra files
+  # switched off, kept for later use
+  exogenous_costs: false        # capital, fixed and variable costs of technologies and transport
+  additional_emissions: false   # CO2 emissions per technology (Emissions|CO2|<technology>)
+
+# combined Excel file in <output_dir>/combined_excel; {date} and {release} are filled in
+combined_file: GENeSYS-MOD-pathways_{date}.xlsx
+
+# region names in the outputs
+regions:
+  total: Europe (incl. Turkey)        # sum over all model regions
+  eu27: EU27 (excl. Malta & Cyprus)   # sum over the EU member states in the model
+
+# check with the upload workflow of the scenario explorer
+validation:
+  run: true
+  workflow_repo: https://github.com/iiasa/idesignres-workflow   # usually https://github.com/iiasa/<project>-workflow
+  cache_dir: ~/.genesysmod_to_iamc                             # local copy of that repository, outside this one

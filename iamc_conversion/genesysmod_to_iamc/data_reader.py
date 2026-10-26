@@ -67,34 +67,6 @@ def loadmap_iso2_countries():
 
         iso2_mapping = {k: v for d in native_list for k, v in d.items()}
 
-
-        #transformed_codelist = {}
-
-        # Iterate over the list of countries and extract key-value pairs
-        # for country_entry in country_codelist[0]['Countries']:
-        #     for country_name, country_data in country_entry.items():
-        #         # Remove the redundant 'countries' key inside the nested dictionary
-        #         country_data.pop('countries', None)
-        #         # Add the entry to the transformed dictionary
-        #         transformed_codelist[country_name] = country_data
-
-#    countries = CodeList.from_directory(
-#        "region", path=definition_dir/'region', file="countries.yaml"
-#    )
-#     iso2_mapping = dict(
-#         [(transformed_codelist[c]['iso2'], c) for c in transformed_codelist]
-#        # add alternative iso2 codes used by the European Commission to the mapping
-#         + [(transformed_codelist[c]['iso2_alt'], c) for c in transformed_codelist
-#            if 'iso2_alt' in transformed_codelist[c]]
-#     )
-
-#    iso2_mapping = dict(
-#        [(countries[c]["iso3"], c) for c in countries]
-#        + [(countries[c]["iso2"], c) for c in countries]
-#        # add alternative iso2 codes used by the European Commission to the mapping
-#        + [(countries[c]["iso2_alt"], c) for c in countries if "iso2_alt" in countries[c]]
-#    )
-#    print(iso2_mapping)
     return iso2_mapping
 
 
@@ -106,19 +78,37 @@ def load_gdx_file(input_file, gams_dir):
     return dw.DataWrapper(input_file, output_gdx)
 
 def load_csv_file(input_file):
+    """Read the result csv files of the Julia version whose names contain input_file (see DEF_CSV_TABLES)."""
     logging.info('Loading CSVs with output results')
-    key_list = ['output_energy_balance', 'output_capacity', 'output_emissions', 'output_costs',
-                'output_exogenous_costs', 'output_technology_costs_detailed', 'output_trade_capacity']
-
     output_csvs = OrderedDict()
 
     for filename in os.listdir(DEF_INPUT_PATH):
-        if input_file in filename:
-            for keyname in key_list:
-                if filename.startswith(keyname) and not filename.startswith('output_energy_balance_annual'):
-                    file_path = os.path.join(DEF_INPUT_PATH, filename)
-                    df = pd.read_csv(file_path)
-                    output_csvs[keyname] = df
+        if input_file not in filename or not filename.endswith('.csv'):
+            continue
+        for table, sheet in DEF_CSV_TABLES.items():
+            # the underscore keeps other tables out, e.g. output_emissions_* (emission intensities)
+            if filename.startswith(table + '_'):
+                if sheet in output_csvs:
+                    raise ValueError(f'Several {table} files contain "{input_file}" in {DEF_INPUT_PATH}')
+                # all columns as text, as in the gdx (e.g. modes are compared with '1'), only values as numbers
+                df = pd.read_csv(os.path.join(DEF_INPUT_PATH, filename), dtype=str, keep_default_na=False)
+                if table == 'output_technology_costs_detailed':
+                    df = _repair_swapped_year_fuel(df)
+                output_csvs[sheet] = df.astype({'Value': float})
 
-
+    missing = [table for table, sheet in DEF_CSV_TABLES.items() if sheet not in output_csvs]
+    if missing:
+        raise FileNotFoundError(f'No {", ".join(missing)} files containing "{input_file}" in {DEF_INPUT_PATH}')
     return dw.DataWrapper(input_file, output_csvs)
+
+
+def _repair_swapped_year_fuel(df):
+    """The Julia version writes the levelized costs of storages with Fuel and Year swapped (genesysmod_results.jl:
+    lc_tot_st is indexed region, technology, year, fuel but written with dim_names Region, Technology, Fuel, Year).
+    Swap them back, so that the rows read like all others."""
+    swapped = ~df['Year'].str.fullmatch(r'\d{4}') & df['Fuel'].str.fullmatch(r'\d{4}')
+    if swapped.any():
+        logging.warning(f'{swapped.sum()} rows of output_technology_costs_detailed had Fuel and Year swapped '
+                        f'(storage levelized costs of the Julia version); swapped back')
+        df.loc[swapped, ['Fuel', 'Year']] = df.loc[swapped, ['Year', 'Fuel']].values
+    return df

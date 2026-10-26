@@ -5,3 +5,6 @@ iamc_conversion/genesysmod_to_iamc/out/
 iamc_conversion/genesysmod_to_iamc/input/
 # definition repositories that nomenclature clones next to a nomenclature.yaml
 common-definitions/
+# python caches and IDE settings
+__pycache__/
+.idea/
