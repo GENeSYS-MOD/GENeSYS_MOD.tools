@@ -1,47 +1,47 @@
-P_Coal_Hardcoal,Electricity|Coal|Hard Coal|w/o CCS
-P_Coal_Lignite,Electricity|Coal|Lignite|w/o CCS
-P_Nuclear,Electricity|Nuclear
-P_Oil,Electricity|Oil|w/o CCS
-P_Biomass,Electricity|Biomass|w/o CCS
-P_CSP,Electricity|Solar|CSP
-P_CSP_Storage,Electricity|Solar|CSP
-P_Geothermal,Electricity|Geothermal
-P_Hydro_Reservoir,Electricity|Hydro
-P_Hydro_RoR,Electricity|Hydro
-P_Ocean,Electricity|Ocean
-P_PV_Rooftop_Commercial,Electricity|Solar|PV
-P_PV_Rooftop_Residential,Electricity|Solar|PV
-P_PV_Utility_Avg,Electricity|Solar|PV
-P_PV_Utility_Inf,Electricity|Solar|PV
-P_PV_Utility_Opt,Electricity|Solar|PV
-P_PV_Utility_Tracking,Electricity|Solar|PV
-P_Wind_Offshore_Transitional,Electricity|Wind|Offshore
-P_Wind_Offshore_Shallow,Electricity|Wind|Offshore
-P_Wind_Offshore_Deep,Electricity|Wind|Offshore
-P_Wind_Onshore_Avg,Electricity|Wind|Onshore
-P_Wind_Onshore_Inf,Electricity|Wind|Onshore
-P_Wind_Onshore_Opt,Electricity|Wind|Onshore
-P_Biomass_CCS,Electricity|Biomass|w/ CCS
-P_Coal_Hardcoal_CCS,Electricity|Coal|Hard Coal|w/ CCS
-P_Coal_Lignite_CCS,Electricity|Coal|Lignite|w/ CCS
-HLI_Fuelcell,Electricity|Other
-HLI_Fuelcell,Electricity|Other
-X_Fuel_Cell,Electricity|Other
-P_H2_OCGT,Electricity|Other
-CHP_Gas_CCGT_Biogas,Electricity|Gas|CCGT|w/o CCS
-CHP_Gas_CCGT_Biogas_CCS,Electricity|Gas|CCGT|w/ CCS
-CHP_Gas_CCGT_Natural,Electricity|Gas|CCGT|w/o CCS
-CHP_Gas_CCGT_Natural_CCS,Electricity|Gas|CCGT|w/ CCS
-CHP_Gas_CCGT_SynGas,Electricity|Synthetic Methane|w/o CCS
-CHP_Biomass_Solid,Electricity|Biomass|w/o CCS
-CHP_Biomass_Solid_CCS,Electricity|Biomass|w/ CCS
-CHP_Coal_Hardcoal,Electricity|Coal|Hard Coal|w/o CCS
-CHP_Coal_Hardcoal_CCS,Electricity|Coal|Hard Coal|w/ CCS
-CHP_Coal_Lignite,Electricity|Coal|Lignite|w/o CCS
-CHP_Coal_Lignite_CCS,Electricity|Coal|Lignite|w/ CCS
-CHP_Oil,Electricity|Oil|w/o CCS
-CHP_Hydrogen_FuelCell,Electricity|Hydrogen|Fuel Cell
-P_Gas_CCGT,Electricity|Gas|CCGT|w/o CCS
-P_Gas_Engines,Electricity|Gas|w/o CCS
-P_Gas_OCGT,Electricity|Gas|OCGT|w/o CCS
-P_Gas_CCS,Electricity|Gas|w/ CCS
+P_Coal_Hardcoal,Secondary Energy|Electricity|Coal|Hard Coal|w/o CCS
+P_Coal_Lignite,Secondary Energy|Electricity|Coal|Lignite|w/o CCS
+P_Nuclear,Secondary Energy|Electricity|Nuclear
+P_Oil,Secondary Energy|Electricity|Oil|w/o CCS
+P_Biomass,Secondary Energy|Electricity|Biomass|w/o CCS
+P_CSP,Secondary Energy|Electricity|Solar|CSP
+P_CSP_Storage,Secondary Energy|Electricity|Solar|CSP
+P_Geothermal,Secondary Energy|Electricity|Geothermal
+P_Hydro_Reservoir,Secondary Energy|Electricity|Hydro
+P_Hydro_RoR,Secondary Energy|Electricity|Hydro
+P_Ocean,Secondary Energy|Electricity|Ocean
+P_PV_Rooftop_Commercial,Secondary Energy|Electricity|Solar|PV
+P_PV_Rooftop_Residential,Secondary Energy|Electricity|Solar|PV
+P_PV_Utility_Avg,Secondary Energy|Electricity|Solar|PV
+P_PV_Utility_Inf,Secondary Energy|Electricity|Solar|PV
+P_PV_Utility_Opt,Secondary Energy|Electricity|Solar|PV
+P_PV_Utility_Tracking,Secondary Energy|Electricity|Solar|PV
+P_Wind_Offshore_Transitional,Secondary Energy|Electricity|Wind|Offshore
+P_Wind_Offshore_Shallow,Secondary Energy|Electricity|Wind|Offshore
+P_Wind_Offshore_Deep,Secondary Energy|Electricity|Wind|Offshore
+P_Wind_Onshore_Avg,Secondary Energy|Electricity|Wind|Onshore
+P_Wind_Onshore_Inf,Secondary Energy|Electricity|Wind|Onshore
+P_Wind_Onshore_Opt,Secondary Energy|Electricity|Wind|Onshore
+P_Biomass_CCS,Secondary Energy|Electricity|Biomass|w/ CCS
+P_Coal_Hardcoal_CCS,Secondary Energy|Electricity|Coal|Hard Coal|w/ CCS
+P_Coal_Lignite_CCS,Secondary Energy|Electricity|Coal|Lignite|w/ CCS
+HLI_Fuelcell,Secondary Energy|Electricity|Other
+HLI_Fuelcell,Secondary Energy|Electricity|Other
+X_Fuel_Cell,Secondary Energy|Electricity|Other
+P_H2_OCGT,Secondary Energy|Electricity|Other
+CHP_Gas_CCGT_Biogas,Secondary Energy|Electricity|Gas|CCGT|w/o CCS
+CHP_Gas_CCGT_Biogas_CCS,Secondary Energy|Electricity|Gas|CCGT|w/ CCS
+CHP_Gas_CCGT_Natural,Secondary Energy|Electricity|Gas|CCGT|w/o CCS
+CHP_Gas_CCGT_Natural_CCS,Secondary Energy|Electricity|Gas|CCGT|w/ CCS
+CHP_Gas_CCGT_SynGas,Secondary Energy|Electricity|Synthetic Methane|w/o CCS
+CHP_Biomass_Solid,Secondary Energy|Electricity|Biomass|w/o CCS
+CHP_Biomass_Solid_CCS,Secondary Energy|Electricity|Biomass|w/ CCS
+CHP_Coal_Hardcoal,Secondary Energy|Electricity|Coal|Hard Coal|w/o CCS
+CHP_Coal_Hardcoal_CCS,Secondary Energy|Electricity|Coal|Hard Coal|w/ CCS
+CHP_Coal_Lignite,Secondary Energy|Electricity|Coal|Lignite|w/o CCS
+CHP_Coal_Lignite_CCS,Secondary Energy|Electricity|Coal|Lignite|w/ CCS
+CHP_Oil,Secondary Energy|Electricity|Oil|w/o CCS
+CHP_Hydrogen_FuelCell,Secondary Energy|Electricity|Hydrogen|Fuel Cell
+P_Gas_CCGT,Secondary Energy|Electricity|Gas|CCGT|w/o CCS
+P_Gas_Engines,Secondary Energy|Electricity|Gas|w/o CCS
+P_Gas_OCGT,Secondary Energy|Electricity|Gas|OCGT|w/o CCS
+P_Gas_CCS,Secondary Energy|Electricity|Gas|w/ CCS

@@ -1,21 +1,21 @@
-FRT_Rail_Conv,Transportation|Freight|Rail|Oil
-FRT_Rail_Electric,Transportation|Freight|Rail|Electric
-FRT_Road_BEV,Transportation|Freight|Road|Electric|Battery
-FRT_Road_H2,Transportation|Freight|Road|Electric|Fuel Cell
-FRT_Road_ICE,Transportation|Freight|Road|Internal Combustion Engine|Oil
-FRT_Road_LNG,Transportation|Freight|Road|Internal Combustion Engine|LNG
-FRT_Road_OH,Transportation|Freight|Road|Electric|Overhead
-FRT_Road_PHEV,Transportation|Freight|Road|Plugin Hybrid
-FRT_Ship_Bio,Transportation|Freight|Maritime|Biofuels
-FRT_Ship_Conv,Transportation|Freight|Maritime|Oil
-FRT_Ship_LNG,Transportation|Freight|Maritime|LNG
-PSNG_Air_Bio,Transportation|Passenger|Aviation|Biofuels
-PSNG_Air_Conv,Transportation|Passenger|Aviation|Oil
-PSNG_Air_H2,Transportation|Passenger|Aviation|Hydrogen
-PSNG_Rail_Conv,Transportation|Passenger|Rail|Oil
-PSNG_Rail_Electric,Transportation|Passenger|Rail|Electric
-PSNG_Road_BEV,Transportation|Passenger|Road|Electric|Battery
-PSNG_Road_H2,Transportation|Passenger|Road|Electric|Fuel Cell
-PSNG_Road_PHEV,Transportation|Passenger|Road|Plugin Hybrid
-PSNG_Road_ICE,Transportation|Passenger|Road|Internal Combustion Engine|Oil
-PSNG_Road_LNG,Transportation|Passenger|Road|Internal Combustion Engine|LNG
+FRT_Rail_Conv,Capacity|Transportation|Freight|Rail|Oil
+FRT_Rail_Electric,Capacity|Transportation|Freight|Rail|Electric
+FRT_Road_BEV,Capacity|Transportation|Freight|Road|Electric|Battery
+FRT_Road_H2,Capacity|Transportation|Freight|Road|Electric|Fuel Cell
+FRT_Road_ICE,Capacity|Transportation|Freight|Road|Internal Combustion Engine|Oil
+FRT_Road_LNG,Capacity|Transportation|Freight|Road|Internal Combustion Engine|LNG
+FRT_Road_OH,Capacity|Transportation|Freight|Road|Electric|Overhead
+FRT_Road_PHEV,Capacity|Transportation|Freight|Road|Plugin Hybrid
+FRT_Ship_Bio,Capacity|Transportation|Freight|Maritime|Biofuels
+FRT_Ship_Conv,Capacity|Transportation|Freight|Maritime|Oil
+FRT_Ship_LNG,Capacity|Transportation|Freight|Maritime|LNG
+PSNG_Air_Bio,Capacity|Transportation|Passenger|Aviation|Biofuels
+PSNG_Air_Conv,Capacity|Transportation|Passenger|Aviation|Oil
+PSNG_Air_H2,Capacity|Transportation|Passenger|Aviation|Hydrogen
+PSNG_Rail_Conv,Capacity|Transportation|Passenger|Rail|Oil
+PSNG_Rail_Electric,Capacity|Transportation|Passenger|Rail|Electric
+PSNG_Road_BEV,Capacity|Transportation|Passenger|Road|Electric|Battery
+PSNG_Road_H2,Capacity|Transportation|Passenger|Road|Electric|Fuel Cell
+PSNG_Road_PHEV,Capacity|Transportation|Passenger|Road|Plugin Hybrid
+PSNG_Road_ICE,Capacity|Transportation|Passenger|Road|Internal Combustion Engine|Oil
+PSNG_Road_LNG,Capacity|Transportation|Passenger|Road|Internal Combustion Engine|LNG

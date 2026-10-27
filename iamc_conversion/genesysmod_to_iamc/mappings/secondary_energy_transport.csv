@@ -1,21 +1,21 @@
-FRT_Rail_Conv,Transportation|Freight|Rail|Oil
-FRT_Rail_Electric,Transportation|Freight|Rail|Electric
-FRT_Road_BEV,Transportation|Freight|Road|Electric|BEV
-FRT_Road_H2,Transportation|Freight|Road|Electric|FCEV
-FRT_Road_ICE,Transportation|Freight|Road|ICE|Oil
-FRT_Road_LNG,Transportation|Freight|Road|ICE|LNG
-FRT_Road_OH,Transportation|Freight|Road|Electric|Overhead
-FRT_Road_PHEV,Transportation|Freight|Road|PHEV
-FRT_Ship_Bio,Transportation|Freight|Maritime|Biofuels
-FRT_Ship_Conv,Transportation|Freight|Maritime|Oil
-FRT_Ship_LNG,Transportation|Freight|Maritime|LNG
-PSNG_Air_Bio,Transportation|Passenger|Aviation|Biofuels
-PSNG_Air_Conv,Transportation|Passenger|Aviation|Oil
-PSNG_Air_H2,Transportation|Passenger|Aviation|Hydrogen
-PSNG_Rail_Conv,Transportation|Passenger|Rail|Oil
-PSNG_Rail_Electric,Transportation|Passenger|Rail|Electric
-PSNG_Road_BEV,Transportation|Passenger|Road|Electric|BEV
-PSNG_Road_H2,Transportation|Passenger|Road|Electric|FCEV
-PSNG_Road_PHEV,Transportation|Passenger|Road|PHEV
-PSNG_Road_ICE,Transportation|Passenger|Road|ICE|Oil
-PSNG_Road_LNG,Transportation|Passenger|Road|LNG|LNG
+FRT_Rail_Conv,Secondary Energy|Transportation|Freight|Rail|Oil
+FRT_Rail_Electric,Secondary Energy|Transportation|Freight|Rail|Electric
+FRT_Road_BEV,Secondary Energy|Transportation|Freight|Road|Electric|BEV
+FRT_Road_H2,Secondary Energy|Transportation|Freight|Road|Electric|FCEV
+FRT_Road_ICE,Secondary Energy|Transportation|Freight|Road|ICE|Oil
+FRT_Road_LNG,Secondary Energy|Transportation|Freight|Road|ICE|LNG
+FRT_Road_OH,Secondary Energy|Transportation|Freight|Road|Electric|Overhead
+FRT_Road_PHEV,Secondary Energy|Transportation|Freight|Road|PHEV
+FRT_Ship_Bio,Secondary Energy|Transportation|Freight|Maritime|Biofuels
+FRT_Ship_Conv,Secondary Energy|Transportation|Freight|Maritime|Oil
+FRT_Ship_LNG,Secondary Energy|Transportation|Freight|Maritime|LNG
+PSNG_Air_Bio,Secondary Energy|Transportation|Passenger|Aviation|Biofuels
+PSNG_Air_Conv,Secondary Energy|Transportation|Passenger|Aviation|Oil
+PSNG_Air_H2,Secondary Energy|Transportation|Passenger|Aviation|Hydrogen
+PSNG_Rail_Conv,Secondary Energy|Transportation|Passenger|Rail|Oil
+PSNG_Rail_Electric,Secondary Energy|Transportation|Passenger|Rail|Electric
+PSNG_Road_BEV,Secondary Energy|Transportation|Passenger|Road|Electric|BEV
+PSNG_Road_H2,Secondary Energy|Transportation|Passenger|Road|Electric|FCEV
+PSNG_Road_PHEV,Secondary Energy|Transportation|Passenger|Road|PHEV
+PSNG_Road_ICE,Secondary Energy|Transportation|Passenger|Road|ICE|Oil
+PSNG_Road_LNG,Secondary Energy|Transportation|Passenger|Road|LNG|LNG

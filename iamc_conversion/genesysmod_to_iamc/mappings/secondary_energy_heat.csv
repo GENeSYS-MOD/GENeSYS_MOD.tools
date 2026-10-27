@@ -1,53 +1,53 @@
-CHP_Biomass_Solid,Residential and Commercial|Biomass
-CHP_Biomass_Solid_CCS,Residential and Commercial|Biomass
-CHP_Coal_Hardcoal,Residential and Commercial|Coal|Hard Coal|w/o CCS
-CHP_Coal_Hardcoal_CCS,Residential and Commercial|Coal|Hard Coal|w/ CCS
-CHP_Coal_Lignite,Residential and Commercial|Coal|Lignite|w/o CCS
-CHP_Coal_Lignite_CCS,Residential and Commercial|Coal|Lignite|w/ CCS
-CHP_Gas_CCGT_Biogas,Residential and Commercial|Gas|CCGT|w/o CCS
-CHP_Gas_CCGT_Biogas_CCS,Residential and Commercial|Gas|CCGT|w/ CCS
-CHP_Gas_CCGT_Natural,Residential and Commercial|Gas|CCGT|w/o CCS
-CHP_Gas_CCGT_Natural_CCS,Residential and Commercial|Gas|CCGT|w/ CCS
-CHP_Gas_CCGT_SynGas,Residential and Commercial|Synthetic Methane|w/o CCS
-CHP_Hydrogen_FuelCell,Residential and Commercial|Hydrogen
-CHP_Oil,Residential and Commercial|Oil
-CHP_WasteToEnergy,Residential and Commercial|Heat|Other
-HHI_BF_BOF,Industry|Coal|Hard Coal|w/o CCS
-HHI_BF_BOF_CCS,Industry|Coal|Hard Coal|w/ CCS
-HHI_Bio_BF_BOF,Industry|Biomass
-HHI_DRI_EAF,Industry|Gas
-HHI_DRI_EAF_CCS,Industry|Gas
-HHI_H2DRI_EAF,Industry|Hydrogen
-HHI_Molten_Electrolysis,Industry|Hydrogen
-HHI_Scrap_EAF,Industry|Electricity
-HLI_Biomass,Industry|Biomass
-HLI_Direct_Electric,Industry|Electricity|Direct
-HLI_Fuelcell,Industry|Hydrogen
-HLI_Gas_Boiler,Industry|Gas
-HLI_Geothermal,Industry|Geothermal
-HLI_Hardcoal,Industry|Coal|Hard Coal|w/o CCS
-HLI_Lignite,Industry|Coal|Lignite|w/o CCS
-HLI_Oil_Boiler,Industry|Oil
-HLI_Solar_Thermal,Industry|Solar
-HB_Biomass,Residential and Commercial|Biomass
-HB_Direct_Electric,Residential and Commercial|Electricity|Direct
-HB_Gas_Boiler,Residential and Commercial|Gas
-HB_Geothermal,Residential and Commercial|Geothermal
-HB_Hardcoal,Residential and Commercial|Coal|Hard Coal|w/o CCS
-HB_Heatpump_Aerial,Residential and Commercial|Electricity|Heat Pump|Air Sourced
-HB_Heatpump_Ground,Residential and Commercial|Electricity|Heat Pump|Ground Sourced
-HB_Lignite,Residential and Commercial|Coal|Lignite|w/o CCS
-HB_Oil_Boiler,Residential and Commercial|Oil
-HB_Solar_Thermal,Residential and Commercial|Solar
-HMHI_Biomass,Industry|Biomass
-HMHI_Gas,Industry|Gas
-HMHI_Gas_CCS,Industry|Gas
-HMHI_HardCoal,Industry|Coal|Hard Coal|w/o CCS
-HMHI_HardCoal_CCS,Industry|Coal|Hard Coal|w/ CCS
-HMHI_Oil,Industry|Oil
-HMHI_Steam_Electric,Industry|Other
-HLI_Convert_DH,Industry|Other
-HMHI_H2,Industry|Hydrogen
-HMLI_Heatpump,Industry|Electricity
-X_Convert_HD_HLI,Industry|Heat
-X_Convert_HD_HB,Residential and Commercial|Heat
+CHP_Biomass_Solid,Secondary Energy|Residential and Commercial|Biomass
+CHP_Biomass_Solid_CCS,Secondary Energy|Residential and Commercial|Biomass
+CHP_Coal_Hardcoal,Secondary Energy|Residential and Commercial|Coal|Hard Coal|w/o CCS
+CHP_Coal_Hardcoal_CCS,Secondary Energy|Residential and Commercial|Coal|Hard Coal|w/ CCS
+CHP_Coal_Lignite,Secondary Energy|Residential and Commercial|Coal|Lignite|w/o CCS
+CHP_Coal_Lignite_CCS,Secondary Energy|Residential and Commercial|Coal|Lignite|w/ CCS
+CHP_Gas_CCGT_Biogas,Secondary Energy|Residential and Commercial|Gas|CCGT|w/o CCS
+CHP_Gas_CCGT_Biogas_CCS,Secondary Energy|Residential and Commercial|Gas|CCGT|w/ CCS
+CHP_Gas_CCGT_Natural,Secondary Energy|Residential and Commercial|Gas|CCGT|w/o CCS
+CHP_Gas_CCGT_Natural_CCS,Secondary Energy|Residential and Commercial|Gas|CCGT|w/ CCS
+CHP_Gas_CCGT_SynGas,Secondary Energy|Residential and Commercial|Synthetic Methane|w/o CCS
+CHP_Hydrogen_FuelCell,Secondary Energy|Residential and Commercial|Hydrogen
+CHP_Oil,Secondary Energy|Residential and Commercial|Oil
+CHP_WasteToEnergy,Secondary Energy|Residential and Commercial|Heat|Other
+HHI_BF_BOF,Secondary Energy|Industry|Coal|Hard Coal|w/o CCS
+HHI_BF_BOF_CCS,Secondary Energy|Industry|Coal|Hard Coal|w/ CCS
+HHI_Bio_BF_BOF,Secondary Energy|Industry|Biomass
+HHI_DRI_EAF,Secondary Energy|Industry|Gas
+HHI_DRI_EAF_CCS,Secondary Energy|Industry|Gas
+HHI_H2DRI_EAF,Secondary Energy|Industry|Hydrogen
+HHI_Molten_Electrolysis,Secondary Energy|Industry|Hydrogen
+HHI_Scrap_EAF,Secondary Energy|Industry|Electricity
+HLI_Biomass,Secondary Energy|Industry|Biomass
+HLI_Direct_Electric,Secondary Energy|Industry|Electricity|Direct
+HLI_Fuelcell,Secondary Energy|Industry|Hydrogen
+HLI_Gas_Boiler,Secondary Energy|Industry|Gas
+HLI_Geothermal,Secondary Energy|Industry|Geothermal
+HLI_Hardcoal,Secondary Energy|Industry|Coal|Hard Coal|w/o CCS
+HLI_Lignite,Secondary Energy|Industry|Coal|Lignite|w/o CCS
+HLI_Oil_Boiler,Secondary Energy|Industry|Oil
+HLI_Solar_Thermal,Secondary Energy|Industry|Solar
+HB_Biomass,Secondary Energy|Residential and Commercial|Biomass
+HB_Direct_Electric,Secondary Energy|Residential and Commercial|Electricity|Direct
+HB_Gas_Boiler,Secondary Energy|Residential and Commercial|Gas
+HB_Geothermal,Secondary Energy|Residential and Commercial|Geothermal
+HB_Hardcoal,Secondary Energy|Residential and Commercial|Coal|Hard Coal|w/o CCS
+HB_Heatpump_Aerial,Secondary Energy|Residential and Commercial|Electricity|Heat Pump|Air Sourced
+HB_Heatpump_Ground,Secondary Energy|Residential and Commercial|Electricity|Heat Pump|Ground Sourced
+HB_Lignite,Secondary Energy|Residential and Commercial|Coal|Lignite|w/o CCS
+HB_Oil_Boiler,Secondary Energy|Residential and Commercial|Oil
+HB_Solar_Thermal,Secondary Energy|Residential and Commercial|Solar
+HMHI_Biomass,Secondary Energy|Industry|Biomass
+HMHI_Gas,Secondary Energy|Industry|Gas
+HMHI_Gas_CCS,Secondary Energy|Industry|Gas
+HMHI_HardCoal,Secondary Energy|Industry|Coal|Hard Coal|w/o CCS
+HMHI_HardCoal_CCS,Secondary Energy|Industry|Coal|Hard Coal|w/ CCS
+HMHI_Oil,Secondary Energy|Industry|Oil
+HMHI_Steam_Electric,Secondary Energy|Industry|Other
+HLI_Convert_DH,Secondary Energy|Industry|Other
+HMHI_H2,Secondary Energy|Industry|Hydrogen
+HMLI_Heatpump,Secondary Energy|Industry|Electricity
+X_Convert_HD_HLI,Secondary Energy|Industry|Heat
+X_Convert_HD_HB,Secondary Energy|Residential and Commercial|Heat

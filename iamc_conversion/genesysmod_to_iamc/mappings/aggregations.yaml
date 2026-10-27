@@ -1,0 +1,150 @@
+# Sums that are added to every scenario after the conversion, in this order (a sum can build on earlier ones).
+# Each step is one of:
+#   - sum: <variable>                    the variable as the sum of its direct sub-variables
+#     of: [<variable>, ...]              ... or as the sum of the variables listed here
+#   - regions: <variable pattern>        the total over all model regions for the matching variables (* matches
+#                                        anything; name of the total in config.yaml; EU27 is summed already)
+#   - drop: <variable>                   remove a helper variable
+# Lines starting with # are switched off and kept for later use.
+
+steps:
+  # ---- primary energy
+  - sum: Primary Energy
+  - sum: Primary Energy|Biomass|Electricity
+  - sum: Primary Energy|Coal|Electricity
+  - sum: Primary Energy|Oil|Electricity
+  - sum: Primary Energy|Gas|Electricity
+  - sum: Primary Energy|Non-Biomass Renewables
+    of: [Primary Energy|Solar, Primary Energy|Wind, Primary Energy|Ocean, Primary Energy|Geothermal,
+         Primary Energy|Hydro]
+  - regions: 'Primary Energy*'
+
+  # ---- final energy
+  - sum: Final Energy|Industry|Liquids
+  - sum: Final Energy|Industry|Solids
+  - sum: Final Energy|Industry|Gases
+  - sum: Final Energy|Industry
+  - sum: Final Energy|Residential and Commercial|Liquids
+  - sum: Final Energy|Residential and Commercial|Solids
+  - sum: Final Energy|Residential and Commercial|Gases
+  - sum: Final Energy|Residential and Commercial
+  - sum: Final Energy|Transportation|Liquids
+  - sum: Final Energy|Transportation
+  # Final Energy|ElectricityDummy is the electricity demand outside the three sectors (dropped below)
+  - sum: Final Energy|Electricity
+    of: [Final Energy|Residential and Commercial|Electricity, Final Energy|Industry|Electricity,
+         Final Energy|Transportation|Electricity, Final Energy|ElectricityDummy]
+  # - sum: Final Energy|Electricity|Transportation
+  #   of: [Final Energy|Transportation|Electricity]
+  # - sum: Final Energy|Electricity|Other (excl. Heat, Cooling, Transport)
+  #   of: [Final Energy|ElectricityDummy]
+  - sum: Final Energy
+    of: [Final Energy|Residential and Commercial, Final Energy|Industry, Final Energy|Transportation,
+         Final Energy|ElectricityDummy]
+  - sum: Final Energy|Gases
+    of: [Final Energy|Residential and Commercial|Gases, Final Energy|Transportation|Gases, Final Energy|Heat|Gases,
+         Final Energy|Electricity|Gases, Final Energy|Industry|Gases]
+  - sum: Final Energy|Hydrogen
+    of: [Final Energy|Residential and Commercial|Hydrogen, Final Energy|Transportation|Hydrogen,
+         Final Energy|Heat|Hydrogen, Final Energy|Electricity|Hydrogen, Final Energy|Industry|Hydrogen]
+  - sum: Final Energy|Liquids
+    of: [Final Energy|Residential and Commercial|Liquids, Final Energy|Transportation|Liquids,
+         Final Energy|Heat|Liquids, Final Energy|Electricity|Liquids, Final Energy|Industry|Liquids]
+  - sum: Final Energy|Solids
+    of: [Final Energy|Residential and Commercial|Solids, Final Energy|Transportation|Solids,
+         Final Energy|Heat|Solids, Final Energy|Electricity|Solids, Final Energy|Industry|Solids]
+  - sum: Final Energy|Solids|Biomass
+    of: [Final Energy|Residential and Commercial|Solids|Biomass, Final Energy|Transportation|Solids|Biomass,
+         Final Energy|Heat|Solids|Biomass, Final Energy|Electricity|Solids|Biomass,
+         Final Energy|Industry|Solids|Biomass]
+  - sum: Final Energy|Solids|Coal
+    of: [Final Energy|Residential and Commercial|Solids|Coal, Final Energy|Transportation|Solids|Coal,
+         Final Energy|Heat|Solids|Coal, Final Energy|Electricity|Solids|Coal, Final Energy|Industry|Solids|Coal]
+  # - sum: Final Energy|Industry|Heat
+  #   of: [Final Energy|Industry]
+  # - sum: Final Energy|Residential and Commercial|Heat
+  #   of: [Final Energy|Residential and Commercial]
+  - regions: 'Final Energy*'
+  - sum: Final Energy|Solar
+    of: [Primary Energy|Solar]
+  - drop: Final Energy|ElectricityDummy
+
+  # ---- capacities
+  - sum: Capacity|Electricity|Biomass
+  - sum: Capacity|Electricity|Coal|Hard Coal
+  - sum: Capacity|Electricity|Coal|Lignite
+  - sum: Capacity|Electricity|Coal
+  - sum: Capacity|Electricity|Gas|CCGT
+  - sum: Capacity|Electricity|Gas|OCGT
+  - sum: Capacity|Electricity|Gas
+  - sum: Capacity|Electricity|Solar|PV|Rooftop
+  - sum: Capacity|Electricity|Solar|PV
+  - sum: Capacity|Electricity|Solar
+  - sum: Capacity|Electricity|Wind
+  - sum: Capacity|Electricity|Hydro
+  - sum: Capacity|Electricity|Oil
+  - sum: Capacity|Electricity
+  - sum: Capacity|Heat|Residential and Commercial|Coal|Hard Coal
+  - sum: Capacity|Heat|Residential and Commercial|Coal|Lignite
+  - sum: Capacity|Heat|Residential and Commercial|Coal
+  - sum: Capacity|Heat|Residential and Commercial|Electricity|Heat Pump
+  - sum: Capacity|Heat|Residential and Commercial|Electricity
+  - sum: Capacity|Heat|Residential and Commercial
+  - sum: Capacity|Heat|Industry|Coal|Hard Coal
+  - sum: Capacity|Heat|Industry|Coal|Lignite
+  - sum: Capacity|Heat|Industry|Coal
+  - sum: Capacity|Heat|Industry
+  - regions: 'Capacity|*'
+  # - sum: Maximum Storage|Electricity
+  - regions: 'Maximum Storage|Electricity*'
+
+  # ---- emissions
+  - sum: Emissions|CO2|Energy|Supply
+  - sum: Emissions|CO2|Energy|Demand
+  - sum: Emissions|CO2|Energy
+  - regions: 'Emissions|CO2|*'
+
+  # ---- energy services of transport (switched off)
+  # - sum: Energy Service|Transportation|Freight|Road|Internal Combustion Engine
+  # - sum: Energy Service|Transportation|Freight|Road|Electric
+  # - sum: Energy Service|Transportation|Freight|Road
+  # - sum: Energy Service|Transportation|Freight|Maritime
+  # - sum: Energy Service|Transportation|Freight|Rail
+  # - sum: Energy Service|Transportation|Freight
+  # - sum: Energy Service|Transportation|Passenger|Road|Internal Combustion Engine
+  # - sum: Energy Service|Transportation|Passenger|Road|Electric
+  # - sum: Energy Service|Transportation|Passenger|Road
+  # - sum: Energy Service|Transportation|Passenger|Air
+  # - sum: Energy Service|Transportation|Passenger|Rail
+  # - sum: Energy Service|Transportation|Passenger
+  # - regions: 'Energy Service|Transportation|*'
+
+  # ---- secondary energy
+  - sum: Secondary Energy|Electricity|Biomass
+  - sum: Secondary Energy|Electricity|Coal|Hard Coal
+  - sum: Secondary Energy|Electricity|Coal|Lignite
+  - sum: Secondary Energy|Electricity|Coal
+  - sum: Secondary Energy|Electricity|Gas|OCGT
+  - sum: Secondary Energy|Electricity|Gas|CCGT
+  - sum: Secondary Energy|Electricity|Oil
+  - sum: Secondary Energy|Electricity|Solar
+  - sum: Secondary Energy|Electricity|Wind
+  - sum: Secondary Energy|Gases
+  - sum: Secondary Energy|Heat|Coal|Hard Coal
+  - sum: Secondary Energy|Heat|Coal|Lignite
+  - sum: Secondary Energy|Heat|Coal
+  # - sum: Secondary Energy|Heat|Industry
+  # - sum: Secondary Energy|Heat|Residential and Commercial
+  - sum: Secondary Energy|Heat
+  - sum: Secondary Energy|Hydrogen
+  - sum: Secondary Energy|Liquids
+  - sum: Secondary Energy|Electricity|Gas
+    of: [Secondary Energy|Electricity|Gas|OCGT, Secondary Energy|Electricity|Gas|CCGT,
+         Secondary Energy|Electricity|Gas|w/ CCS, Secondary Energy|Electricity|Gas|w/o CCS]
+  - sum: Secondary Energy|Electricity
+  - regions: 'Secondary Energy|*'
+
+  # ---- costs (switched off)
+  # - regions: 'Capital Cost|*'
+  # - regions: 'Fixed Cost|*'
+  # - regions: 'Variable Cost|*'

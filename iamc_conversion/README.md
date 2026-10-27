@@ -46,14 +46,35 @@ unit that the explorer would reject. Fix them in the mappings (below) and run th
 | To change | Edit |
 | --- | --- |
 | GAMS path, model version, release, years, scenarios, what to convert, explorer | `config.yaml` |
-| GENeSYS-MOD technology or fuel to IAMC variable | `genesysmod_to_iamc/mappings/*.csv` |
+| GENeSYS-MOD technology or fuel to IAMC variable | `genesysmod_to_iamc/mappings/*.csv` (table below) |
+| sums of variables (e.g. Capacity\|Electricity from its parts) and the total over all regions | `genesysmod_to_iamc/mappings/aggregations.yaml` |
 | country codes to country names | `genesysmod_to_iamc/mappings/GENeSYS-MOD 4.0.yaml` |
 | variables reported as zero when the model has none | `genesysmod_to_iamc/mappings/zero_var.csv` |
-| sums of variables (e.g. Capacity\|Electricity from its parts) | `genesysmod_to_iamc/pyam_aggregator.py` |
 | which variables, regions and units are allowed | the explorer's workflow repository (not here) |
 
+The mapping files have two columns and no header: the GENeSYS-MOD name and the full IAMC variable. Several
+GENeSYS-MOD names can go to the same variable; their values are added. Technologies and fuels that are in none of
+the files are left out, apart from a few that `data_transform.py` selects itself (nuclear primary energy, heat
+demand, networks, carbon price).
+
+| File | GENeSYS-MOD name | IAMC variables |
+| --- | --- | --- |
+| `primary_energy_fuels.csv` | fuel used (outside storage) | `Primary Energy\|Biomass`, `\|Coal`, ... |
+| `primary_energy_renewables.csv` | technology producing solar, wind, hydro, ocean or geothermal energy | `Primary Energy\|Solar`, ... |
+| `primary_energy_electricity.csv` | power plant (its fuel use) | `Primary Energy\|<fuel>\|Electricity\|...` |
+| `final_energy_sector.csv` and `final_energy_fuel.csv` | technology using the fuel, and the fuel | `Final Energy\|<sector>` and `<carrier>`, joined with `\|` |
+| `secondary_energy_power.csv`, `_heat.csv`, `_other.csv` | technology producing electricity, heat or fuels | `Secondary Energy\|...` |
+| `capacity_technologies.csv`, `storages.csv`, `capacity_transport_technologies.csv` | technology | `Capacity\|...` |
+| `emissions_technologies.csv` | technology | `Emissions\|CO2\|...` |
+| `cost_types.csv` and `costs.csv` | cost type of the results, and technology | `Levelized Cost\|<type>` and `<technology>`, joined with `\|` |
+
+`aggregations.yaml` lists the sums in the order in which they are added; its first lines explain the entries.
+
 Switched-off parts (exogenous costs, CO2 emissions per technology) can be switched on under `outputs` in
-`config.yaml`. A few smaller ones are kept as commented code marked "switched off" in `data_transform.py`.
+`config.yaml`. Smaller ones are kept for later use: as commented code marked "switched off" in
+`data_transform.py`, as commented lines in `aggregations.yaml`, and as rows starting with `#` in the mapping files.
+`secondary_energy_transport.csv`, `storages_e2p_ratios.csv` and `units_transport_technologies.csv` are only used
+by switched-off code.
 
 ## Assumptions in the conversion
 
@@ -70,10 +91,10 @@ Switched-off parts (exogenous costs, CO2 emissions per technology) can be switch
 | File | What it does |
 | --- | --- |
 | `_statics.py` | reads `config.yaml`; fixed column and sheet names of the GENeSYS-MOD outputs |
-| `data_reader.py` | reads the gdx or csv results and the mapping files |
+| `data_reader.py` | reads the gdx or csv results and the files in `mappings/` |
 | `data_wrapper.py` | holds the results of one scenario, split into production, use, capacity, emissions, costs and trade |
-| `data_transform.py` | turns them into IAMC variables: primary, final and secondary energy, capacities, emissions, costs, networks |
-| `pyam_aggregator.py` | adds the sums of variables and regions, and the country names |
+| `data_transform.py` | turns them into IAMC variables with the mapping files (primary, final and secondary energy, capacities, emissions, costs, networks), converts units and adds EU27 |
+| `pyam_aggregator.py` | adds the sums of `aggregations.yaml` and renames the regions to country names |
 | `series_generator.py` | optional hourly demand series |
 | `validation.py` | the check with the explorer's workflow |
 | `__init__.py` | `run()`, `generate_data()`, `generate_combined_excel_yearly()`, `validate()` |

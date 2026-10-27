@@ -1,4 +1,4 @@
-Electricity Storage|Lithium-Ion,4
-Electricity Storage|Redox Flow,4
-Electricity Storage|Compressed Air,16
-Electricity Storage|Pumped Storage,100
+Capacity|Electricity|Electricity Storage|Lithium-Ion,4
+Capacity|Electricity|Electricity Storage|Redox Flow,4
+Capacity|Electricity|Electricity Storage|Compressed Air,16
+Capacity|Electricity|Electricity Storage|Pumped Storage,100

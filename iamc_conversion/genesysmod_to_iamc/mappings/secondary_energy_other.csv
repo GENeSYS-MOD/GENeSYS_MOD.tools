@@ -1,22 +1,22 @@
-#RES_Grass,Solids|Biomass
-#RES_Wood,Solids|Biomass
-#RES_Residues,Solids|Biomass
-#RES_Paper_Cardboard,Solids|Biomass
-#RES_Roundwood,Solids|Biomass
-#RES_Biogas,Gases|Biomass
-#RES_Biomass,Solids|Biomass
-X_Electrolysis,Hydrogen|Electricity
-X_Methanation,Gases|Biomass
-X_SMR,Hydrogen|Gas|w/o CCS
-X_SMR_CCS,Hydrogen|Gas|w/ CCS
-X_ATR_CCS,Hydrogen|Gas|w/ CCS
-X_Biofuel,Liquids|Biomass
-X_Powerfuel,Liquids|Other
-#R_Coal_Hardcoal,Solids|Coal
-#R_Coal_Lignite,Solids|Coal
-#R_Gas,Gases|Gas
-#R_Oil,Liquids|Oil
-Z_Import_Gas,Gases|Gas
-Z_Import_Hardcoal,Solids|Coal
-Z_Import_Oil,Liquids|Oil
-Z_Import_LNG,Gases|Gas
+#RES_Grass,Secondary Energy|Solids|Biomass
+#RES_Wood,Secondary Energy|Solids|Biomass
+#RES_Residues,Secondary Energy|Solids|Biomass
+#RES_Paper_Cardboard,Secondary Energy|Solids|Biomass
+#RES_Roundwood,Secondary Energy|Solids|Biomass
+#RES_Biogas,Secondary Energy|Gases|Biomass
+#RES_Biomass,Secondary Energy|Solids|Biomass
+X_Electrolysis,Secondary Energy|Hydrogen|Electricity
+X_Methanation,Secondary Energy|Gases|Biomass
+X_SMR,Secondary Energy|Hydrogen|Gas|w/o CCS
+X_SMR_CCS,Secondary Energy|Hydrogen|Gas|w/ CCS
+X_ATR_CCS,Secondary Energy|Hydrogen|Gas|w/ CCS
+X_Biofuel,Secondary Energy|Liquids|Biomass
+X_Powerfuel,Secondary Energy|Liquids|Other
+#R_Coal_Hardcoal,Secondary Energy|Solids|Coal
+#R_Coal_Lignite,Secondary Energy|Solids|Coal
+#R_Gas,Secondary Energy|Gases|Gas
+#R_Oil,Secondary Energy|Liquids|Oil
+Z_Import_Gas,Secondary Energy|Gases|Gas
+Z_Import_Hardcoal,Secondary Energy|Solids|Coal
+Z_Import_Oil,Secondary Energy|Liquids|Oil
+Z_Import_LNG,Secondary Energy|Gases|Gas
