@@ -11,8 +11,8 @@ def generate_idataframe(data_wrapper, filter_only_yearly_values=False):
     model regions renamed to the region names of the scenario explorer."""
     logging.info('Executing: generate_idataframe')
     idataframe = pyam.IamDataFrame(pd.concat(list(data_wrapper.transformed_data.values())))
-    # only the model years of config.yaml (the results also hold a few 2020 rows that are no model results)
-    idataframe = idataframe.filter(year=DEF_YEARS)
+    # only the model years of the settings (the results also hold a few 2020 rows that are no model results)
+    idataframe = idataframe.filter(year=settings.years)
 
     for step in dr.load_aggregations():
         if 'sum' in step:
@@ -21,7 +21,8 @@ def generate_idataframe(data_wrapper, filter_only_yearly_values=False):
                                  recursive=step.get('recursive', False))
         elif 'regions' in step:
             # the total over all model regions, named 'World' by pyam and renamed below
-            idataframe.aggregate_region(variable=step['regions'], subregions=DEF_TOTAL_SUBREGIONS, append=True)
+            idataframe.aggregate_region(variable=step['regions'], subregions=[settings.eu27_region] + DEF_NON_EU_REGIONS,
+                                        append=True)
         elif 'drop' in step:
             idataframe = pyam.IamDataFrame(idataframe.data[idataframe.data['variable'] != step['drop']])
         else:
@@ -32,7 +33,7 @@ def generate_idataframe(data_wrapper, filter_only_yearly_values=False):
     for r in iso2_mapping:
         idataframe.rename(region={r: iso2_mapping[r]}, inplace=True)
 
-    idataframe = pyam.IamDataFrame(idataframe.data.replace({'region': 'World'}, DEF_REGION_NAME))
+    idataframe = pyam.IamDataFrame(idataframe.data.replace({'region': 'World'}, settings.total_region))
     idataframe.rename(region={'NONEU_Balkan': 'Non-EU-Balkans'}, inplace=True)
 
     if filter_only_yearly_values:

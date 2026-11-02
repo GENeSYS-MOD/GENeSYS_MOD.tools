@@ -14,10 +14,10 @@ def generate_final_energy_series(data_wrapper: dw.DataWrapper, series_name: str,
     _filtered = _filtered[_filtered['variable'] == fuel_name]
     _filtered = _filtered.groupby(['region', 'year'])['value'].sum().reset_index()
 
-    for year in DEF_YEARS:
+    for year in settings.years:
         _series = data_wrapper.demand_series[series_name].copy()
         _series['unit'] = 'EJ/yr'
-        _series['model'] = DEF_MODEL_AND_VERSION
+        _series['model'] = settings.model
         _series['fuel'] = fuel_name
         _series = dt._set_scenarios(_series, data_wrapper)
         _series['year'] = year
@@ -30,7 +30,7 @@ def generate_final_energy_series(data_wrapper: dw.DataWrapper, series_name: str,
     outputs = []
     iso2_mapping = dr.loadmap_iso2_countries()
 
-    for year in DEF_YEARS:
+    for year in settings.years:
         for region in regions:
             _yearly = _filtered.copy()
             if region == 'NONEU_Balkan':
@@ -62,7 +62,7 @@ def generate_final_energy_series(data_wrapper: dw.DataWrapper, series_name: str,
 
     data_wrapper.output_series[fuel_name] = output_frame
 
-    output_frame.to_csv(DEF_OUTPUT_PATH / (series_name + ".csv"))
+    output_frame.to_csv(settings.output_path / (series_name + ".csv"))
     return output_frame
 
 
@@ -85,4 +85,4 @@ def output_series(data_wrapper: dw.DataWrapper):
 
     output_file = data_wrapper.input_file + "_series.csv"
 
-    idataframe.to_csv(DEF_OUTPUT_PATH / output_file)
+    idataframe.to_csv(settings.output_path / output_file)

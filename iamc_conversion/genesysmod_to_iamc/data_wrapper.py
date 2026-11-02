@@ -26,7 +26,7 @@ class DataWrapper(object):
         self.init_time_slices()
 
         self.input_file = input_file
-        # scenario name in the outputs; set from config.yaml when the results are loaded
+        # scenario name in the outputs; set from the settings when the results are loaded
         self.scenario = input_file
 
         self.idataframe = None
@@ -76,7 +76,7 @@ class DataWrapper(object):
     def write_all_transformed_csv(self):
         for file in self.transformed_data:
             filename = file + ".csv"
-            self.transformed_data[file].to_csv(DEF_OUTPUT_PATH / filename, sep=';')
+            self.transformed_data[file].to_csv(settings.output_path / filename, sep=';')
 
     def generate_idataframe(self, filter_only_yearly_values=False):
         self.idataframe = pa.generate_idataframe(self, filter_only_yearly_values)

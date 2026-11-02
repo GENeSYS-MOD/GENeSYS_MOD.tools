@@ -4,7 +4,7 @@ Every IIASA scenario explorer validates uploads with the workflow of its project
 (`workflow.py` with a function `main`, plus that project's definitions and its `nomenclature.yaml`,
 which in turn pulls the IAMC common-definitions). This module keeps a local copy of that repository
 outside of this repository, updates it before every check and runs its `main` on the data.
-The repository is set in `_statics.py` (DEF_WORKFLOW_REPO_URL), so a future project only needs a new url.
+The repository is a setting (workflow_repo), so a future project only needs a new url.
 """
 import importlib.metadata
 import importlib.util
@@ -18,13 +18,16 @@ import pyam
 from genesysmod_to_iamc._statics import *
 
 
-def workflow_repo_dir(url: str = DEF_WORKFLOW_REPO_URL) -> Path:
-    """Local folder of the workflow repository, named after the repository."""
-    return DEF_WORKFLOW_CACHE_DIR / url.rstrip('/').split('/')[-1].removesuffix('.git')
+def workflow_repo_dir(url: str = None) -> Path:
+    """Local folder of the workflow repository (default: the one of the settings), named after the repository."""
+    url = url or settings.workflow_repo
+    return settings.workflow_cache_path / url.rstrip('/').split('/')[-1].removesuffix('.git')
 
 
-def update_workflow_repo(url: str = DEF_WORKFLOW_REPO_URL) -> Path:
-    """Clone the workflow repository, or pull its newest version if it is already there."""
+def update_workflow_repo(url: str = None) -> Path:
+    """Clone the workflow repository (default: the one of the settings), or pull its newest version if it is
+    already there."""
+    url = url or settings.workflow_repo
     local_dir = workflow_repo_dir(url)
     if (local_dir / '.git').is_dir():
         logging.info(f'Updating the workflow repository in {local_dir}')
@@ -64,7 +67,7 @@ def validate(data, update: bool = True, report_file=None) -> bool:
         for name in ('nomenclature', 'pyam'):
             logging.getLogger(name).removeHandler(messages)
 
-    report_file = Path(report_file) if report_file else DEF_OUTPUT_PATH / 'validation_report.txt'
+    report_file = Path(report_file) if report_file else settings.output_path / 'validation_report.txt'
     _write_report(report_file, data, local_dir, passed, error, messages.lines)
     if passed:
         logging.info(f'Validation passed; report: {report_file}')
@@ -94,7 +97,7 @@ def _write_report(report_file: Path, data, local_dir: Path, passed: bool, error,
         'Validation of GENeSYS-MOD outputs with the scenario explorer workflow',
         f'date:                {time.strftime("%Y-%m-%d %H:%M")}',
         f'data:                {data if not isinstance(data, pyam.IamDataFrame) else "IamDataFrame"}',
-        f'workflow repository: {DEF_WORKFLOW_REPO_URL}, commit {_commit(local_dir)}',
+        f'workflow repository: {settings.workflow_repo}, commit {_commit(local_dir)}',
         f'common-definitions:  commit {_commit(local_dir / "common-definitions")}',
         f'packages:            {versions}',
         f'result:              {"PASSED" if passed else "FAILED"}',

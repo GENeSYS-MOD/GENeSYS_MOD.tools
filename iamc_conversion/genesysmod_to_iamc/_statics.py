@@ -1,43 +1,51 @@
+import logging
 import os
 from pathlib import Path
+from types import SimpleNamespace
 
-import yaml
+# folder of the converter, with the notebook iamc_conversion_outputs.ipynb and run.py; relative folders in the
+# settings are relative to it
+DEF_BASE_PATH = Path(__file__).parents[1]
+DEF_MAPPINGS_PATH = Path(__file__).parent / 'mappings'
 
-# settings that change between releases or projects are read from config.yaml (one folder above this package);
-# another settings file can be used by setting the environment variable GENESYSMOD_IAMC_CONFIG
-CONFIG_FILE = Path(os.environ.get('GENESYSMOD_IAMC_CONFIG', Path(__file__).parents[1] / 'config.yaml'))
-with open(CONFIG_FILE, encoding='utf-8') as _file:
-    CONFIG = yaml.safe_load(_file)
+
+class _Settings(SimpleNamespace):
+    def __getattr__(self, name):
+        raise AttributeError(f'The setting "{name}" is not set: run genesysmod_to_iamc.configure() first (the '
+                             f'conversion cell of iamc_conversion_outputs.ipynb and run.py do this)')
+
+
+# the settings of a conversion, set with configure()
+settings = _Settings()
+
+
+def configure(*, gams_dir, input_dir, file_type, scenarios, model, release, years, transmission, hourly_series,
+              load_factors, combine, output_dir, combined_file, total_region, eu27_region, run_validation,
+              workflow_repo, leave_out=(), exogenous_costs=False, additional_emissions=False,
+              workflow_cache_dir='~/.genesysmod_to_iamc'):
+    """Set the settings of the conversion (explained in iamc_conversion_outputs.ipynb and run.py).
+
+    scenarios: the result files (without extension), whose names are also the scenario names in the outputs, or a
+    dict {result file: scenario name}. Relative folders are relative to the converter folder (DEF_BASE_PATH)."""
+    if file_type not in ('gdx', 'csv'):
+        raise ValueError(f"file_type must be 'gdx' or 'csv', not {file_type!r}")
+    vars(settings).update(
+        gams_dir=gams_dir, input_path=_folder(input_dir), file_type=file_type,
+        scenarios=dict(scenarios) if isinstance(scenarios, dict) else {file: file for file in scenarios},
+        model=model, release=release or '', years=list(years),
+        transmission=transmission, hourly_series=hourly_series, load_factors=load_factors, combine=combine,
+        exogenous_costs=exogenous_costs, additional_emissions=additional_emissions,
+        output_path=_folder(output_dir), combined_file=combined_file, leave_out=list(leave_out),
+        total_region=total_region, eu27_region=eu27_region,
+        run_validation=run_validation, workflow_repo=workflow_repo, workflow_cache_path=_folder(workflow_cache_dir))
+    logging.info(f'Settings: scenarios {", ".join(settings.scenarios.values())}, release {settings.release or "-"}, '
+                 f'results in {settings.input_path}, outputs in {settings.output_path}')
 
 
 def _folder(path):
-    """A folder from the settings; relative paths are relative to the settings file."""
+    """A folder from the settings; relative paths are relative to the converter folder (DEF_BASE_PATH)."""
     path = Path(os.path.expanduser(path))
-    return path if path.is_absolute() else CONFIG_FILE.parent / path
-
-
-DEF_GAMS_DIR = CONFIG['gams_dir']
-
-DEF_MAPPINGS_PATH = Path(__file__).parent / 'mappings'
-DEF_INPUT_PATH = _folder(CONFIG['input_dir'])
-DEF_OUTPUT_PATH = _folder(CONFIG['output_dir'])
-
-DEF_MODEL_AND_VERSION = CONFIG['model']
-DEF_RELEASE = CONFIG.get('release') or ''
-DEF_YEARS = CONFIG['years']
-DEF_FILE_TYPE = CONFIG['file_type']
-DEF_SCENARIOS = CONFIG['scenarios']
-DEF_OUTPUTS = CONFIG['outputs']
-DEF_COMBINED_FILE = CONFIG['combined_file']
-DEF_LEAVE_OUT = CONFIG.get('leave_out') or []
-
-DEF_REGION_NAME = CONFIG['regions']['total']
-DEF_EU27_NAME = CONFIG['regions']['eu27']
-
-# scenario explorer whose upload check is used to validate the outputs (see validation.py)
-DEF_RUN_VALIDATION = CONFIG['validation']['run']
-DEF_WORKFLOW_REPO_URL = CONFIG['validation']['workflow_repo']
-DEF_WORKFLOW_CACHE_DIR = _folder(CONFIG['validation']['cache_dir'])
+    return path if path.is_absolute() else DEF_BASE_PATH / path
 
 
 DEF_PRODUCTION_COLUMNS = ["region",
@@ -103,8 +111,8 @@ DEF_CSV_TABLES = {
     'output_trade': DEF_TRADE_CAPACITY_SHEET,
 }
 
-# EU member states among the model regions (Malta and Cyprus are not modelled), and the regions that add up to
-# the total over all model regions (DEF_REGION_NAME)
+# EU member states among the model regions (Malta and Cyprus are not modelled), and the other model regions, which
+# add up with EU27 to the total over all model regions (total_region in the settings)
 DEF_EU27 = ['AT', 'BE', 'BG', 'HR', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT',
             'LV', 'LT', 'LU', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE']
-DEF_TOTAL_SUBREGIONS = [DEF_EU27_NAME, 'NO', 'NONEU_Balkan', 'TR', 'UK', 'CH']
+DEF_NON_EU_REGIONS = ['NO', 'NONEU_Balkan', 'TR', 'UK', 'CH']

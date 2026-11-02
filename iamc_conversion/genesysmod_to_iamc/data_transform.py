@@ -20,7 +20,7 @@ MODE_KEYS = ['region', 'technology', 'mode', 'subannual', 'year']
 
 
 def _set_scenarios(frame: pd.DataFrame, data_wrapper: dw.DataWrapper):
-    # every result file holds one scenario; its name in the outputs comes from config.yaml
+    # every result file holds one scenario; its name in the outputs comes from the settings
     return frame.assign(scenario=data_wrapper.scenario)
 
 
@@ -68,7 +68,7 @@ def _add_eu27(frame: pd.DataFrame, copy_of: str = None):
         eu27 = eu27.groupby(['Model', 'Scenario', 'Variable', 'Unit', 'Subannual', 'Year'])['Value'].sum().reset_index()
     else:
         eu27 = frame[frame['Region'] == copy_of].copy()
-    eu27['Region'] = DEF_EU27_NAME
+    eu27['Region'] = settings.eu27_region
     return pd.concat([frame, eu27])
 
 
@@ -152,7 +152,7 @@ def generate_primary_energy_values(data_wrapper: dw.DataWrapper):
 
     primary_energy = pd.concat([traditional_energy, non_res_biomass, nuclear, _primary_energy_by_use(data_wrapper)])
 
-    primary_energy['model'] = DEF_MODEL_AND_VERSION
+    primary_energy['model'] = settings.model
     primary_energy['unit'] = 'EJ/yr'
     primary_energy['value'] = abs(primary_energy['value'] / 1000)
 
@@ -194,7 +194,7 @@ def generate_final_energy_values(data_wrapper: dw.DataWrapper):
 
     final_energy = pd.concat([use_values, use_electricity_values, output_values])
 
-    final_energy['model'] = DEF_MODEL_AND_VERSION
+    final_energy['model'] = settings.model
     final_energy['unit'] = 'EJ/yr'
     final_energy['value'] = abs(final_energy['value'] / 1000)
 
@@ -217,7 +217,7 @@ def generate_capacity_values(data_wrapper: dw.DataWrapper):
     capacity_values = capacity_values[capacity_values['technology'].isin(map_capacity_technology.keys())]
     capacity_values = _rename(capacity_values, 'technology', map_capacity_technology)
 
-    capacity_values['model'] = DEF_MODEL_AND_VERSION
+    capacity_values['model'] = settings.model
     capacity_values['unit'] = 'GW'
     capacity_values['value'] = abs(capacity_values['value'])
     capacity_values['subannual'] = 'Year'
@@ -234,7 +234,7 @@ def generate_transmission_capacity_values(data_wrapper: dw.DataWrapper):
 
     trade_values = data_wrapper.trade_capacity_values.copy()
     trade_values = trade_values[(trade_values['type'] == 'Transmissions Capacity') & trade_values['fuel'].isin(['Power', 'Gas_Natural', 'H2'])]
-    trade_values['model'] = DEF_MODEL_AND_VERSION
+    trade_values['model'] = settings.model
     trade_values['value'] = abs(trade_values['value'])*1000
     trade_values['subannual'] = 'Year'
 
@@ -264,7 +264,7 @@ def generate_transmission_capacity_values(data_wrapper: dw.DataWrapper):
     trade_values = _to_iamc(trade_values, 'variable')
 
     data_wrapper.transformed_data['transmission'] = trade_values
-    trade_values.to_csv(DEF_OUTPUT_PATH / "trade_values.csv", index=False)
+    trade_values.to_csv(settings.output_path / "trade_values.csv", index=False)
     return trade_values
 
 
@@ -282,7 +282,7 @@ def generate_storage_capacity_values(data_wrapper: dw.DataWrapper):
     # switched off: storage energy capacity in GWh from the energy-to-power ratios (storages_e2p_ratios.csv)
     # capacity_values['unit'] = 'GWh'
     # capacity_values['value'] = abs(capacity_values['value']) * capacity_values['technology'].map(map_e2p_ratios)
-    capacity_values['model'] = DEF_MODEL_AND_VERSION
+    capacity_values['model'] = settings.model
     capacity_values['subannual'] = 'Year'
 
     capacity_values = _set_scenarios(capacity_values, data_wrapper)
@@ -304,7 +304,7 @@ def generate_transport_capacity_values(data_wrapper: dw.DataWrapper):
     capacity_values['unit'] = 'Gvkm'
     capacity_values = _rename(capacity_values, 'technology', map_capacity_technology)
 
-    capacity_values['model'] = DEF_MODEL_AND_VERSION
+    capacity_values['model'] = settings.model
     # switched off: transport capacity units per technology (units_transport_technologies.csv)
     # for entry in map_units_technology:
     #     capacity_values.loc[(capacity_values['technology'] == 'Capacity|' + entry), 'unit'] = map_units_technology[entry]
@@ -338,7 +338,7 @@ def generate_emissions_values(data_wrapper: dw.DataWrapper):
     emission_values = _rename(emission_values, 'technology', map_emissions_technologies)
     emission_values = pd.concat([emission_values, heat_values])
 
-    emission_values['model'] = DEF_MODEL_AND_VERSION
+    emission_values['model'] = settings.model
     emission_values['unit'] = 'Mt CO2/yr'
     emission_values['subannual'] = 'Year'
 
@@ -350,7 +350,7 @@ def generate_emissions_values(data_wrapper: dw.DataWrapper):
 
 
 def generate_additional_emissions_values(data_wrapper: dw.DataWrapper):
-    # switched off by default (outputs: additional_emissions in config.yaml): CO2 emissions per technology,
+    # switched off by default (additional_emissions in the settings): CO2 emissions per technology,
     # named after the capacity variables (Capacity|X -> Emissions|CO2|X)
     logging.info('Executing: generate_additional_emissions_values')
     map_capacity_technology = dr.loadmap_from_csv('capacity_technologies')
@@ -360,7 +360,7 @@ def generate_additional_emissions_values(data_wrapper: dw.DataWrapper):
     emission_values = emission_values[emission_values['technology'].isin(map_emissions.keys())]
     emission_values = _rename(emission_values, 'technology', map_emissions)
 
-    emission_values['model'] = DEF_MODEL_AND_VERSION
+    emission_values['model'] = settings.model
     emission_values['unit'] = 'Mt CO2/yr'
     emission_values['subannual'] = 'Year'
 
@@ -402,7 +402,7 @@ def generate_secondary_energy(data_wrapper: dw.DataWrapper):
 
     secondary_energy = pd.concat([power_values, heat_values, other_values])
 
-    secondary_energy['model'] = DEF_MODEL_AND_VERSION
+    secondary_energy['model'] = settings.model
     secondary_energy['value'] = abs(secondary_energy['value'] / 1000)
 
     secondary_energy = _set_scenarios(secondary_energy, data_wrapper)
@@ -422,7 +422,7 @@ def generate_useful_energy_heat(data_wrapper: dw.DataWrapper):
 
     useful_heat = _select(prod_values[prod_values['fuel'].isin(HEAT_FUELS)], dr.loadmap_from_csv('useful_energy_heat'))
 
-    useful_heat['model'] = DEF_MODEL_AND_VERSION
+    useful_heat['model'] = settings.model
     useful_heat['unit'] = 'EJ/yr'
     useful_heat['value'] = abs(useful_heat['value'] / 1000)
 
@@ -445,7 +445,7 @@ def _generate_exogenous_costs_values(data_wrapper: dw.DataWrapper, cost_type: st
     cost_values = cost_values[cost_values['technology'].isin(map_costs.keys())]
     cost_values = _rename(cost_values, 'technology', map_costs)
 
-    cost_values['model'] = DEF_MODEL_AND_VERSION
+    cost_values['model'] = settings.model
 
     convert_eur_to2010_dollar = 1 / 1.08 * 1.17
 
@@ -507,7 +507,7 @@ def _generate_detailed_costs_values(data_wrapper: dw.DataWrapper, cost_type: str
     #
     #     cost_values = pd.concat([cost_values, storage_values], ignore_index=True)
 
-    cost_values['model'] = DEF_MODEL_AND_VERSION
+    cost_values['model'] = settings.model
     cost_values['unit'] = 'million EUR_2020/PJ'
 
     cost_values = _set_scenarios(cost_values, data_wrapper)
@@ -548,7 +548,7 @@ def _generate_exogenous_transport_costs_values(data_wrapper: dw.DataWrapper, cos
     else:
         cost_values['unit'] = 'n/a'
 
-    cost_values['model'] = DEF_MODEL_AND_VERSION
+    cost_values['model'] = settings.model
 
     for entry in map_units_technology:
         cost_values = cost_values.replace({'unit': entry}, map_units_technology[entry])
@@ -572,7 +572,7 @@ def generate_co2_prices(data_wrapper: dw.DataWrapper):
 
     cost_values['technology'] = 'Price|Carbon'
     cost_values['unit'] = 'EUR_2020/t CO2'
-    cost_values['model'] = DEF_MODEL_AND_VERSION
+    cost_values['model'] = settings.model
     cost_values['value'] = abs(cost_values['value'])
     cost_values['subannual'] = 'Year'
 
@@ -584,7 +584,7 @@ def generate_co2_prices(data_wrapper: dw.DataWrapper):
 
 
 def generate_exogenous_costs(data_wrapper: dw.DataWrapper):
-    # switched off by default (outputs: exogenous_costs in config.yaml)
+    # switched off by default (exogenous_costs in the settings)
     logging.info('Executing: generate_capital_costs_values')
     _generate_exogenous_costs_values(data_wrapper, "Capital Costs")
 
@@ -623,9 +623,9 @@ def _generate_load_factors(data_wrapper: dw.DataWrapper, excel_file: str, sheet_
 
     dataframe['unit'] = '%'
     dataframe['technology'] = 'Load Factor|Electricity|' + nomenclature_name
-    dataframe['model'] = DEF_MODEL_AND_VERSION
+    dataframe['model'] = settings.model
 
-    dataframe = pd.concat([dataframe.assign(year=str(y)) for y in DEF_YEARS])
+    dataframe = pd.concat([dataframe.assign(year=str(y)) for y in settings.years])
     dataframe = _to_iamc(dataframe, 'technology', 'mean')
 
     # dataframe = dataframe.replace({'Region': 'UK'}, 'GB')
@@ -653,7 +653,7 @@ def _generate_demand_series(data_wrapper: dw.DataWrapper, excel_file: str, sheet
 
 def _read_hourly_series(excel_file: str, sheet_name: str):
     """One sheet of Timeseries_<scenario>.xlsx as rows of hour (as MM-DD HH:MM+01:00), region and value."""
-    dataframe = pd.read_excel(DEF_INPUT_PATH / excel_file, sheet_name=sheet_name)
+    dataframe = pd.read_excel(settings.input_path / excel_file, sheet_name=sheet_name)
 
     timeseries = pd.Timestamp('2015-01-01') + pd.to_timedelta(dataframe.index, unit='h')
     timeseries = timeseries.strftime('%m-%d %H:%M+01:00')

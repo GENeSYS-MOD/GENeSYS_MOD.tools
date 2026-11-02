@@ -3,13 +3,18 @@
 # Create it with:      conda env create -f environment.yml
 # then activate it:   conda activate genesysmod-iamc
 # Before an upload, bring the check up to the explorer's version:  pip install -U nomenclature-iamc pyam-iamc
+# All conda packages come from conda-forge. Add further ones with
+#     conda install --override-channels -c conda-forge <package>
+# (packages from Anaconda's own channel do not always work together with them).
 name: genesysmod-iamc
 channels:
   - conda-forge
+  - nodefaults
 dependencies:
   - python=3.12
   - pip
   - ipykernel
+  - notebook   # Jupyter, to run iamc_conversion_outputs.ipynb in the browser
   - pip:
       - nomenclature-iamc>=0.32.1
       - pyam-iamc>=4.0

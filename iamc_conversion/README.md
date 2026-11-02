@@ -9,21 +9,28 @@ upload.
     conda env create -f environment.yml
     conda activate genesysmod-iamc
 
-GAMS has to be installed (path in `config.yaml`), because the gdx files are read through it.
+GAMS has to be installed (path in the settings), because the gdx files are read through it.
 
 ## Run
 
 1. Put the results of every scenario into `genesysmod_to_iamc/input/`: `<scenario>.gdx` of the GAMS version, or
    the result csv files of the Julia version (written with `switch_processed_results = 1`; their names contain the
-   run name, which goes into `config.yaml` as the scenario's `file`). `Timeseries_<scenario>.xlsx` is only needed
-   for the hourly series and load factors.
-2. Check `config.yaml`: GAMS path, model version, release, the list of scenarios and the scenario explorer.
-3. Run `python run.py` in this folder, or the notebook `iamc_conversion_outputs.ipynb`.
+   run name, which goes into the settings as the scenario's result file). `Timeseries_<scenario>.xlsx` is only
+   needed for the hourly series and load factors.
+2. Choose the settings and start the conversion, in the notebook or from a terminal:
+   - Notebook: open `iamc_conversion_outputs.ipynb` (start `jupyter notebook` in this folder with the environment
+     activated, or open it in VS Code with the kernel `genesysmod-iamc`), choose the settings in its settings cells
+     (GAMS path, model version, release, scenarios, what to convert, the scenario explorer) and run all cells.
+   - Terminal: choose the settings at the top of `run.py` and run `python run.py` in this folder, with the
+     environment activated.
+
+Both run the same conversion, but each keeps its own settings: a change in the notebook does not change `run.py`,
+and the other way round.
 
 Outputs in `genesysmod_to_iamc/out/`:
 
 - `<scenario>_yearly.csv` for every scenario (and `<scenario>_combined.csv` with the optional hourly files),
-- the upload file in `combined_excel/` (name set in `config.yaml`),
+- the upload file in `combined_excel/` (name in the settings),
 - `validation_report.txt` with the result of the check.
 
 ## The check before an upload
@@ -32,17 +39,20 @@ Every scenario explorer checks uploads with the workflow of its project reposito
 `https://github.com/iiasa/<project>-workflow`. That repository brings the project's definitions and pulls the IAMC
 common-definitions. The converter keeps a copy of it in `~/.genesysmod_to_iamc/`, updates it before every check
 and runs the same workflow, so no definitions have to be downloaded by hand. For another project, change
-`validation: workflow_repo` in `config.yaml`.
+`workflow_repo` in the settings.
 
 The explorer runs the newest `nomenclature-iamc`, so update the package before an upload:
 
     pip install -U nomenclature-iamc pyam-iamc
 
-To check a file on its own: `python run.py --validate <file.xlsx>`. The report lists every variable, region or
-unit that the explorer would reject. Fix them in the mappings (below) and run the conversion again.
+In the notebook, run `%pip install -U nomenclature-iamc pyam-iamc` in a cell and restart the kernel.
+
+To check a file on its own, run `python run.py --validate <file.xlsx>`, or in the notebook
+`genesysmod_to_iamc.validate('<file.xlsx>')` (under single steps). The report lists every variable, region or unit
+that the explorer would reject. Fix them in the mappings (below) and run the conversion again.
 
 Variables whose definitions are not in the explorer yet (e.g. while a change to the workflow repository waits for
-review) can be kept out of the upload file with `leave_out` in `config.yaml`; the `*_yearly.csv` files keep them.
+review) can be kept out of the upload file with `leave_out` in the settings; the `*_yearly.csv` files keep them.
 At present these are the `Useful Energy` variables and the solar thermal and geothermal heat of buildings
 (`Final Energy|Residential and Commercial|Solar`, `|Geothermal`), which need the iDesignRES definitions of
 heat.yaml and tag_heat-source.yaml. Until they are in, `Final Energy|Residential and Commercial` in the upload
@@ -53,7 +63,7 @@ file is larger than its listed parts by that solar thermal and geothermal heat. 
 
 | To change | Edit |
 | --- | --- |
-| GAMS path, model version, release, years, scenarios, what to convert, explorer | `config.yaml` |
+| GAMS path, model version, release, years, scenarios, what to convert, explorer | the settings cells of `iamc_conversion_outputs.ipynb`, or the top of `run.py` |
 | GENeSYS-MOD technology or fuel to IAMC variable | `genesysmod_to_iamc/mappings/*.csv` (table below) |
 | sums of variables (e.g. Capacity\|Electricity from its parts) and the total over all regions | `genesysmod_to_iamc/mappings/aggregations.yaml` |
 | country codes to country names | `genesysmod_to_iamc/mappings/GENeSYS-MOD 4.0.yaml` |
@@ -82,8 +92,8 @@ demand without sector, networks, carbon price).
 
 `aggregations.yaml` lists the sums in the order in which they are added; its first lines explain the entries.
 
-Switched-off parts (exogenous costs, CO2 emissions per technology) can be switched on under `outputs` in
-`config.yaml`. Smaller ones are kept for later use: as commented code marked "switched off" in
+Switched-off parts (exogenous costs, CO2 emissions per technology) can be switched on in the settings
+(`exogenous_costs`, `additional_emissions`). Smaller ones are kept for later use: as commented code marked "switched off" in
 `data_transform.py`, as commented lines in `aggregations.yaml`, and as rows starting with `#` in the mapping files.
 `secondary_energy_transport.csv`, `storages_e2p_ratios.csv` and `units_transport_technologies.csv` are only used
 by switched-off code.
@@ -112,7 +122,7 @@ by switched-off code.
 - The electricity demand that the model does not assign to a sector is `Final Energy|Other Sector|Electricity`.
 - The exogenous emissions of the model (non-energy sources, from the national inventories) are
   `Emissions|CO2|Other`; `Emissions|CO2` is the sum of energy and other emissions.
-- Only the model years in `config.yaml` are reported.
+- Only the model years of the settings are reported.
 - Primary energy of solar, wind, hydro, ocean and geothermal energy is the output of the technologies using them.
 - EU27 is the sum over the 25 EU member states in the model (Malta and Cyprus are not modelled). Costs, levelized
   costs and the carbon price of EU27 are those of Germany.
@@ -126,11 +136,11 @@ by switched-off code.
 
 | File | What it does |
 | --- | --- |
-| `_statics.py` | reads `config.yaml`; fixed column and sheet names of the GENeSYS-MOD outputs |
+| `_statics.py` | the settings (set with `configure()`); fixed column and sheet names of the GENeSYS-MOD outputs |
 | `data_reader.py` | reads the gdx or csv results and the files in `mappings/` |
 | `data_wrapper.py` | holds the results of one scenario, split into production, use, capacity, emissions, costs and trade |
 | `data_transform.py` | turns them into IAMC variables with the mapping files (primary, secondary, final and useful energy, capacities, emissions, costs, networks), splits CHP fuel and emissions into electricity and heat, converts units and adds EU27 |
 | `pyam_aggregator.py` | adds the sums of `aggregations.yaml` and renames the regions to country names |
 | `series_generator.py` | optional hourly demand series |
 | `validation.py` | the check with the explorer's workflow |
-| `__init__.py` | `run()`, `generate_data()`, `generate_combined_excel_yearly()`, `validate()` |
+| `__init__.py` | `configure()`, `run()`, `generate_data()`, `generate_combined_excel_yearly()`, `validate()` |

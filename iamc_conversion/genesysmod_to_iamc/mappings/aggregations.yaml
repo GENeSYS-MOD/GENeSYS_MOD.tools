@@ -5,7 +5,7 @@
 #     recursive: true                    ... or all levels below it, bottom-up (stops with an error if a level
 #                                        that exists already differs from the sum of its parts)
 #   - regions: <variable pattern>        the total over all model regions for the matching variables (* matches
-#                                        anything; name of the total in config.yaml; EU27 is summed already)
+#                                        anything; name of the total in the settings; EU27 is summed already)
 #   - drop: <variable>                   remove a helper variable
 # Lines starting with # are switched off and kept for later use.
 
