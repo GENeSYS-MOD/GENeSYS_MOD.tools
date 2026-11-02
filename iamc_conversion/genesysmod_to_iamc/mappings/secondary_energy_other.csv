@@ -6,7 +6,6 @@
 #RES_Biogas,Secondary Energy|Gases|Biomass
 #RES_Biomass,Secondary Energy|Solids|Biomass
 X_Electrolysis,Secondary Energy|Hydrogen|Electricity
-X_Methanation,Secondary Energy|Gases|Biomass
 X_SMR,Secondary Energy|Hydrogen|Gas|w/o CCS
 X_SMR_CCS,Secondary Energy|Hydrogen|Gas|w/ CCS
 X_ATR_CCS,Secondary Energy|Hydrogen|Gas|w/ CCS
@@ -20,3 +19,5 @@ Z_Import_Gas,Secondary Energy|Gases|Gas
 Z_Import_Hardcoal,Secondary Energy|Solids|Coal
 Z_Import_Oil,Secondary Energy|Liquids|Oil
 Z_Import_LNG,Secondary Energy|Gases|Gas
+X_Methanation:1,Secondary Energy|Gases|Hydrogen
+X_Methanation:2,Secondary Energy|Gases|Biomass

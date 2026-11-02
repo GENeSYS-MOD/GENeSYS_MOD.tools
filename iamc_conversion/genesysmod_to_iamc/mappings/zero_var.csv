@@ -1,13 +1,10 @@
 Variable,Type
-Final Energy|Geothermal,Final Energy
 Final Energy|Industry|Other,Final Energy
 Final Energy|Non-Energy Use,Final Energy
 Final Energy|Non-Energy Use|Solids|Biomass,Final Energy
 Final Energy|Non-Energy Use|Solids|Coal,Final Energy
 Final Energy|Non-Energy Use|Liquids|Oil,Final Energy
 Final Energy|Other,Final Energy
-Final Energy|Other Sector,Final Energy
-Final Energy|Other Sector|Electricity,Final Energy
 Final Energy|Other Sector|Gases,Final Energy
 Final Energy|Other Sector|Heat,Final Energy
 Final Energy|Other Sector|Hydrogen,Final Energy
@@ -21,3 +18,5 @@ Final Energy|Transportation|Other,Final Energy
 Final Energy|Non-Energy Use|Gases,Final Energy
 Final Energy|Other Sector|Solids|Coal,Final Energy
 Primary Energy|Other,Primary Energy
+Final Energy|Non-Energy Use|Liquids,Final Energy
+Final Energy|Non-Energy Use|Solids,Final Energy

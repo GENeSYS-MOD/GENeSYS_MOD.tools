@@ -10,9 +10,17 @@ from collections import OrderedDict
 
 def loadmap_from_csv(file):
     """A mapping file (mappings/<file>.csv, two columns without header) as a dict: GENeSYS-MOD name -> IAMC name.
-    Rows whose first column starts with # are switched off (they never match a GENeSYS-MOD name)."""
+    Every name may appear once. Rows whose first column starts with # are switched off (they never match a
+    GENeSYS-MOD name); a name technology:mode applies to that operating mode only (see _select in
+    data_transform.py)."""
     filename = file + ".csv"
-    return pd.read_csv(DEF_MAPPINGS_PATH / filename, header=None, index_col=0).squeeze("columns").to_dict()
+    table = pd.read_csv(DEF_MAPPINGS_PATH / filename, header=None, index_col=0)
+    names = table.index.astype(str)
+    twice = sorted(set(names[names.duplicated() & ~names.str.startswith('#')]))
+    if twice:
+        raise ValueError(f'mappings/{filename} lists {", ".join(twice)} more than once; a name can have one '
+                         f'variable only')
+    return table.squeeze("columns").to_dict()
 
 def loaddf_from_csv(file):
     filename = file + ".csv"

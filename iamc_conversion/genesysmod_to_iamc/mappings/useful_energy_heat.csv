@@ -1,0 +1,40 @@
+HHI_BF_BOF,Useful Energy|Industry|Heat|Coal|Hard Coal|w/o CCS
+HHI_BF_BOF_CCS,Useful Energy|Industry|Heat|Coal|Hard Coal|w/ CCS
+HHI_Bio_BF_BOF,Useful Energy|Industry|Heat|Biomass
+HHI_DRI_EAF,Useful Energy|Industry|Heat|Gas
+HHI_DRI_EAF_CCS,Useful Energy|Industry|Heat|Gas
+HHI_H2DRI_EAF,Useful Energy|Industry|Heat|Hydrogen
+HHI_Molten_Electrolysis,Useful Energy|Industry|Heat|Electricity|Direct
+HHI_Scrap_EAF,Useful Energy|Industry|Heat|Electricity|Direct
+HLI_Biomass,Useful Energy|Industry|Heat|Biomass
+HLI_Direct_Electric,Useful Energy|Industry|Heat|Electricity|Direct
+HLI_Gas_Boiler,Useful Energy|Industry|Heat|Gas
+HLI_Geothermal,Useful Energy|Industry|Heat|Geothermal
+HLI_Hardcoal,Useful Energy|Industry|Heat|Coal|Hard Coal|w/o CCS
+HLI_Lignite,Useful Energy|Industry|Heat|Coal|Lignite|w/o CCS
+HLI_Oil_Boiler,Useful Energy|Industry|Heat|Oil
+HLI_Solar_Thermal,Useful Energy|Industry|Heat|Solar
+HB_Biomass,Useful Energy|Residential and Commercial|Heat|Biomass
+HB_Direct_Electric,Useful Energy|Residential and Commercial|Heat|Electricity|Direct
+HB_Gas_Boiler,Useful Energy|Residential and Commercial|Heat|Gas
+HB_Geothermal,Useful Energy|Residential and Commercial|Heat|Geothermal
+HB_Hardcoal,Useful Energy|Residential and Commercial|Heat|Coal|Hard Coal|w/o CCS
+HB_Heatpump_Aerial,Useful Energy|Residential and Commercial|Heat|Electricity|Heat Pump|Air Sourced
+HB_Heatpump_Ground,Useful Energy|Residential and Commercial|Heat|Electricity|Heat Pump|Ground Sourced
+HB_Lignite,Useful Energy|Residential and Commercial|Heat|Coal|Lignite|w/o CCS
+HB_Oil_Boiler,Useful Energy|Residential and Commercial|Heat|Oil
+HB_Solar_Thermal,Useful Energy|Residential and Commercial|Heat|Solar
+HMHI_Biomass,Useful Energy|Industry|Heat|Biomass
+HMHI_Gas,Useful Energy|Industry|Heat|Gas
+HMHI_Gas_CCS,Useful Energy|Industry|Heat|Gas
+HMHI_HardCoal,Useful Energy|Industry|Heat|Coal|Hard Coal|w/o CCS
+HMHI_HardCoal_CCS,Useful Energy|Industry|Heat|Coal|Hard Coal|w/ CCS
+HMHI_Oil,Useful Energy|Industry|Heat|Oil
+HMHI_Steam_Electric,Useful Energy|Industry|Heat|Electricity|Direct
+HMHI_H2,Useful Energy|Industry|Heat|Hydrogen
+HMLI_Heatpump,Useful Energy|Industry|Heat|Electricity|Heat Pump
+HB_H2_Boiler,Useful Energy|Residential and Commercial|Heat|Hydrogen
+HLI_H2_Boiler,Useful Energy|Industry|Heat|Hydrogen
+HLI_Heatpump,Useful Energy|Industry|Heat|Electricity|Heat Pump
+X_Convert_HD:1,Useful Energy|Residential and Commercial|Heat|District Heating
+X_Convert_HD:2,Useful Energy|Industry|Heat|District Heating

@@ -1,0 +1,6 @@
+X_Convert_HD:1,Final Energy|Residential and Commercial|Heat
+X_Convert_HD:2,Final Energy|Industry|Heat
+HB_Solar_Thermal,Final Energy|Residential and Commercial|Solar
+HB_Geothermal,Final Energy|Residential and Commercial|Geothermal
+HLI_Solar_Thermal,Final Energy|Industry|Solar
+HLI_Geothermal,Final Energy|Industry|Geothermal

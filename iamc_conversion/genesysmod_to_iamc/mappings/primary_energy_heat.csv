@@ -1,0 +1,13 @@
+CHP_Biomass_Solid,Primary Energy|Biomass|Heat|w/o CCS
+CHP_Biomass_Solid_CCS,Primary Energy|Biomass|Heat|w/ CCS
+CHP_Coal_Hardcoal,Primary Energy|Coal|Heat|w/o CCS
+CHP_Coal_Hardcoal_CCS,Primary Energy|Coal|Heat|w/ CCS
+CHP_Coal_Lignite,Primary Energy|Coal|Heat|w/o CCS
+CHP_Coal_Lignite_CCS,Primary Energy|Coal|Heat|w/ CCS
+CHP_Gas_CCGT_Biogas,Primary Energy|Biomass|Heat|w/o CCS
+CHP_Gas_CCGT_Biogas_CCS,Primary Energy|Biomass|Heat|w/ CCS
+CHP_Gas_CCGT_Natural,Primary Energy|Gas|Heat|w/o CCS
+CHP_Gas_CCGT_Natural_CCS,Primary Energy|Gas|Heat|w/ CCS
+CHP_Oil,Primary Energy|Oil|Heat|w/o CCS
+HD_Gas_Boiler:1,Primary Energy|Gas|Heat|w/o CCS
+HD_Gas_Boiler:2,Primary Energy|Biomass|Heat|w/o CCS

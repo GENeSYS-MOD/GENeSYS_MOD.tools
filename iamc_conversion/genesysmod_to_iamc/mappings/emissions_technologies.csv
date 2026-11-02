@@ -64,35 +64,25 @@ P_Coal_Lignite_CCS,Emissions|CO2|Energy|Supply|Electricity
 P_H2_OCGT,Emissions|CO2|Energy|Supply|Electricity
 P_Nuclear,Emissions|CO2|Energy|Supply|Electricity
 P_Oil,Emissions|CO2|Energy|Supply|Electricity
-CHP_Gas_CCGT_Biogas,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_Gas_CCGT_Biogas_CCS,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_Gas_CCGT_Natural,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_Gas_CCGT_Natural_CCS,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_Gas_CCGT_SynGas,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_Biomass_Solid,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_Biomass_Solid_CCS,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_Coal_Hardcoal,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_Coal_Hardcoal_CCS,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_Coal_Lignite,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_Coal_Lignite_CCS,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_Oil,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_Hydrogen_FuelCell,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_WasteToEnergy,Emissions|CO2|Energy|Demand|Residential and Commercial
-CHP_Gas_CCGT_Biogas,Emissions|CO2|Energy|Demand|Industry
-CHP_Gas_CCGT_Biogas_CCS,Emissions|CO2|Energy|Demand|Industry
-CHP_Gas_CCGT_Natural,Emissions|CO2|Energy|Demand|Industry
-CHP_Gas_CCGT_Natural_CCS,Emissions|CO2|Energy|Demand|Industry
-CHP_Gas_CCGT_SynGas,Emissions|CO2|Energy|Demand|Industry
-CHP_Biomass_Solid,Emissions|CO2|Energy|Demand|Industry
-CHP_Biomass_Solid_CCS,Emissions|CO2|Energy|Demand|Industry
-CHP_Coal_Hardcoal,Emissions|CO2|Energy|Demand|Industry
-CHP_Coal_Hardcoal_CCS,Emissions|CO2|Energy|Demand|Industry
-CHP_Coal_Lignite,Emissions|CO2|Energy|Demand|Industry
-CHP_Coal_Lignite_CCS,Emissions|CO2|Energy|Demand|Industry
-CHP_Oil,Emissions|CO2|Energy|Demand|Industry
-CHP_Hydrogen_FuelCell,Emissions|CO2|Energy|Demand|Industry
-CHP_WasteToEnergy,Emissions|CO2|Energy|Demand|Industry
 P_Gas_CCGT,Emissions|CO2|Energy|Supply|Electricity
 P_Gas_Engines,Emissions|CO2|Energy|Supply|Electricity
 P_Gas_OCGT,Emissions|CO2|Energy|Supply|Electricity
 P_Gas_CCS,Emissions|CO2|Energy|Supply|Electricity
+CHP_Biomass_Solid,Emissions|CO2|Energy|Supply|Electricity
+CHP_Biomass_Solid_CCS,Emissions|CO2|Energy|Supply|Electricity
+CHP_Coal_Hardcoal,Emissions|CO2|Energy|Supply|Electricity
+CHP_Coal_Hardcoal_CCS,Emissions|CO2|Energy|Supply|Electricity
+CHP_Coal_Lignite,Emissions|CO2|Energy|Supply|Electricity
+CHP_Coal_Lignite_CCS,Emissions|CO2|Energy|Supply|Electricity
+CHP_Gas_CCGT_Biogas,Emissions|CO2|Energy|Supply|Electricity
+CHP_Gas_CCGT_Biogas_CCS,Emissions|CO2|Energy|Supply|Electricity
+CHP_Gas_CCGT_Natural,Emissions|CO2|Energy|Supply|Electricity
+CHP_Gas_CCGT_Natural_CCS,Emissions|CO2|Energy|Supply|Electricity
+CHP_Gas_CCGT_SynGas,Emissions|CO2|Energy|Supply|Electricity
+CHP_Hydrogen_FuelCell,Emissions|CO2|Energy|Supply|Electricity
+CHP_Oil,Emissions|CO2|Energy|Supply|Electricity
+CHP_WasteToEnergy,Emissions|CO2|Energy|Supply|Electricity
+HD_Gas_Boiler,Emissions|CO2|Energy|Supply|Heat
+X_SMR,Emissions|CO2|Energy|Supply|Hydrogen
+X_ATR_CCS,Emissions|CO2|Energy|Supply|Hydrogen
+ExogenousEmissions,Emissions|CO2|Other

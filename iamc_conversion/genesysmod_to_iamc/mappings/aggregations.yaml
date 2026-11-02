@@ -2,6 +2,8 @@
 # Each step is one of:
 #   - sum: <variable>                    the variable as the sum of its direct sub-variables
 #     of: [<variable>, ...]              ... or as the sum of the variables listed here
+#     recursive: true                    ... or all levels below it, bottom-up (stops with an error if a level
+#                                        that exists already differs from the sum of its parts)
 #   - regions: <variable pattern>        the total over all model regions for the matching variables (* matches
 #                                        anything; name of the total in config.yaml; EU27 is summed already)
 #   - drop: <variable>                   remove a helper variable
@@ -14,6 +16,10 @@ steps:
   - sum: Primary Energy|Coal|Electricity
   - sum: Primary Energy|Oil|Electricity
   - sum: Primary Energy|Gas|Electricity
+  - sum: Primary Energy|Biomass|Heat
+  - sum: Primary Energy|Coal|Heat
+  - sum: Primary Energy|Oil|Heat
+  - sum: Primary Energy|Gas|Heat
   - sum: Primary Energy|Non-Biomass Renewables
     of: [Primary Energy|Solar, Primary Energy|Wind, Primary Energy|Ocean, Primary Energy|Geothermal,
          Primary Energy|Hydro]
@@ -30,17 +36,18 @@ steps:
   - sum: Final Energy|Residential and Commercial
   - sum: Final Energy|Transportation|Liquids
   - sum: Final Energy|Transportation
-  # Final Energy|ElectricityDummy is the electricity demand outside the three sectors (dropped below)
+  # Other Sector: the electricity demand that the model does not assign to a sector
+  - sum: Final Energy|Other Sector
   - sum: Final Energy|Electricity
     of: [Final Energy|Residential and Commercial|Electricity, Final Energy|Industry|Electricity,
-         Final Energy|Transportation|Electricity, Final Energy|ElectricityDummy]
+         Final Energy|Transportation|Electricity, Final Energy|Other Sector|Electricity]
   # - sum: Final Energy|Electricity|Transportation
   #   of: [Final Energy|Transportation|Electricity]
   # - sum: Final Energy|Electricity|Other (excl. Heat, Cooling, Transport)
-  #   of: [Final Energy|ElectricityDummy]
+  #   of: [Final Energy|Other Sector|Electricity]
   - sum: Final Energy
     of: [Final Energy|Residential and Commercial, Final Energy|Industry, Final Energy|Transportation,
-         Final Energy|ElectricityDummy]
+         Final Energy|Other Sector]
   - sum: Final Energy|Gases
     of: [Final Energy|Residential and Commercial|Gases, Final Energy|Transportation|Gases, Final Energy|Heat|Gases,
          Final Energy|Electricity|Gases, Final Energy|Industry|Gases]
@@ -60,14 +67,15 @@ steps:
   - sum: Final Energy|Solids|Coal
     of: [Final Energy|Residential and Commercial|Solids|Coal, Final Energy|Transportation|Solids|Coal,
          Final Energy|Heat|Solids|Coal, Final Energy|Electricity|Solids|Coal, Final Energy|Industry|Solids|Coal]
-  # - sum: Final Energy|Industry|Heat
-  #   of: [Final Energy|Industry]
-  # - sum: Final Energy|Residential and Commercial|Heat
-  #   of: [Final Energy|Residential and Commercial]
-  - regions: 'Final Energy*'
+  # Heat is district heat where it is delivered; Solar and Geothermal the heat of the collectors and wells of
+  # buildings and industry
+  - sum: Final Energy|Heat
+    of: [Final Energy|Residential and Commercial|Heat, Final Energy|Industry|Heat, Final Energy|Other Sector|Heat]
   - sum: Final Energy|Solar
-    of: [Primary Energy|Solar]
-  - drop: Final Energy|ElectricityDummy
+    of: [Final Energy|Residential and Commercial|Solar, Final Energy|Industry|Solar]
+  - sum: Final Energy|Geothermal
+    of: [Final Energy|Residential and Commercial|Geothermal, Final Energy|Industry|Geothermal]
+  - regions: 'Final Energy*'
 
   # ---- capacities
   - sum: Capacity|Electricity|Biomass
@@ -83,6 +91,7 @@ steps:
   - sum: Capacity|Electricity|Wind
   - sum: Capacity|Electricity|Hydro
   - sum: Capacity|Electricity|Oil
+  - sum: Capacity|Electricity|Hydrogen
   - sum: Capacity|Electricity
   - sum: Capacity|Heat|Residential and Commercial|Coal|Hard Coal
   - sum: Capacity|Heat|Residential and Commercial|Coal|Lignite
@@ -93,7 +102,13 @@ steps:
   - sum: Capacity|Heat|Industry|Coal|Hard Coal
   - sum: Capacity|Heat|Industry|Coal|Lignite
   - sum: Capacity|Heat|Industry|Coal
+  - sum: Capacity|Heat|Industry|Electricity
   - sum: Capacity|Heat|Industry
+  # all heat capacities: district heating by source and the sectors' own (CHPs are under Capacity|Electricity)
+  - sum: Capacity|Heat
+  - sum: Capacity|Hydrogen|Gas
+  - sum: Capacity|Hydrogen
+  - sum: Capacity|Liquids
   - regions: 'Capacity|*'
   # - sum: Maximum Storage|Electricity
   - regions: 'Maximum Storage|Electricity*'
@@ -102,7 +117,9 @@ steps:
   - sum: Emissions|CO2|Energy|Supply
   - sum: Emissions|CO2|Energy|Demand
   - sum: Emissions|CO2|Energy
-  - regions: 'Emissions|CO2|*'
+  # Other: the exogenous emissions of the model (non-energy sources, from the national inventories)
+  - sum: Emissions|CO2
+  - regions: 'Emissions|CO2*'
 
   # ---- energy services of transport (switched off)
   # - sum: Energy Service|Transportation|Freight|Road|Internal Combustion Engine
@@ -129,13 +146,13 @@ steps:
   - sum: Secondary Energy|Electricity|Oil
   - sum: Secondary Energy|Electricity|Solar
   - sum: Secondary Energy|Electricity|Wind
+  - sum: Secondary Energy|Electricity|Hydrogen
   - sum: Secondary Energy|Gases
-  - sum: Secondary Energy|Heat|Coal|Hard Coal
-  - sum: Secondary Energy|Heat|Coal|Lignite
-  - sum: Secondary Energy|Heat|Coal
-  # - sum: Secondary Energy|Heat|Industry
-  # - sum: Secondary Energy|Heat|Residential and Commercial
+  - sum: Secondary Energy|Solids
+  # centralized heat (district heat) by source
   - sum: Secondary Energy|Heat
+    recursive: true
+  - sum: Secondary Energy|Hydrogen|Gas
   - sum: Secondary Energy|Hydrogen
   - sum: Secondary Energy|Liquids
   - sum: Secondary Energy|Electricity|Gas
@@ -143,6 +160,13 @@ steps:
          Secondary Energy|Electricity|Gas|w/ CCS, Secondary Energy|Electricity|Gas|w/o CCS]
   - sum: Secondary Energy|Electricity
   - regions: 'Secondary Energy|*'
+
+  # ---- useful energy: heat delivered to end uses, by sector and source
+  - sum: Useful Energy|Residential and Commercial|Heat
+    recursive: true
+  - sum: Useful Energy|Industry|Heat
+    recursive: true
+  - regions: 'Useful Energy*'
 
   # ---- costs (switched off)
   # - regions: 'Capital Cost|*'

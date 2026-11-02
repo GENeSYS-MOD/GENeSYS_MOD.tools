@@ -26,21 +26,6 @@ HMHI_Steam_Electric,Final Energy|Industry
 HMLI_Heatpump,Final Energy|Industry
 HMHI_H2,Final Energy|Industry
 HLI_Convert_DH,Final Energy|Industry
-CHP_Gas_CCGT_Biogas,Final Energy|Industry
-CHP_Gas_CCGT_Biogas_CCS,Final Energy|Industry
-CHP_Gas_CCGT_Natural,Final Energy|Industry
-CHP_Gas_CCGT_Natural_CCS,Final Energy|Industry
-CHP_Gas_CCGT_SynGas,Final Energy|Industry
-CHP_Biomass_Solid,Final Energy|Industry
-CHP_Biomass_Solid_CCS,Final Energy|Industry
-CHP_Coal_Hardcoal,Final Energy|Industry
-CHP_Coal_Hardcoal_CCS,Final Energy|Industry
-CHP_Coal_Lignite,Final Energy|Industry
-CHP_Coal_Lignite_CCS,Final Energy|Industry
-CHP_Oil,Final Energy|Industry
-CHP_Hydrogen_FuelCell,Final Energy|Industry
-CHP_WasteToEnergy,Final Energy|Industry
-X_Convert_HD,Final Energy|Industry
 HB_Biomass,Final Energy|Residential and Commercial
 HB_Direct_Electric,Final Energy|Residential and Commercial
 HB_Gas_Boiler,Final Energy|Residential and Commercial
@@ -53,21 +38,6 @@ HB_Lignite,Final Energy|Residential and Commercial
 HB_Oil_Boiler,Final Energy|Residential and Commercial
 HB_Convert_DH,Final Energy|Residential and Commercial
 HB_Solar_Thermal,Final Energy|Residential and Commercial
-CHP_Gas_CCGT_Biogas,Final Energy|Residential and Commercial
-CHP_Gas_CCGT_Biogas_CCS,Final Energy|Residential and Commercial
-CHP_Gas_CCGT_Natural,Final Energy|Residential and Commercial
-CHP_Gas_CCGT_Natural_CCS,Final Energy|Residential and Commercial
-CHP_Gas_CCGT_SynGas,Final Energy|Residential and Commercial
-CHP_Biomass_Solid,Final Energy|Residential and Commercial
-CHP_Biomass_Solid_CCS,Final Energy|Residential and Commercial
-CHP_Coal_Hardcoal,Final Energy|Residential and Commercial
-CHP_Coal_Hardcoal_CCS,Final Energy|Residential and Commercial
-CHP_Coal_Lignite,Final Energy|Residential and Commercial
-CHP_Coal_Lignite_CCS,Final Energy|Residential and Commercial
-CHP_Oil,Final Energy|Residential and Commercial
-CHP_Hydrogen_FuelCell,Final Energy|Residential and Commercial
-CHP_WasteToEnergy,Final Energy|Residential and Commercial
-X_Convert_HD,Final Energy|Residential and Commercial
 FRT_Rail_Conv,Final Energy|Transportation
 FRT_Rail_Electric,Final Energy|Transportation
 FRT_Road_BEV,Final Energy|Transportation
@@ -89,3 +59,4 @@ PSNG_Road_H2,Final Energy|Transportation
 PSNG_Road_ICE,Final Energy|Transportation
 PSNG_Road_LNG,Final Energy|Transportation
 PSNG_Road_PHEV,Final Energy|Transportation
+HLI_Heatpump,Final Energy|Industry

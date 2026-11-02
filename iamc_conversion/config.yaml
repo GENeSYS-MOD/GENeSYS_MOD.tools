@@ -14,7 +14,7 @@ output_dir: genesysmod_to_iamc/out
 model: GENeSYS-MOD 4.1
 release: v2.0
 
-# years of the hourly series and load factors (the yearly values cover all years in the results)
+# model years: the outputs cover only these years (other years in the results are left out)
 years: [2018, 2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060]
 
 # type of the result files: gdx (GAMS version) or csv (Julia version)
@@ -44,6 +44,14 @@ outputs:
 
 # combined Excel file in <output_dir>/combined_excel; {date} and {release} are filled in
 combined_file: GENeSYS-MOD-pathways_{date}.xlsx
+
+# variables left out of the combined (upload) file, e.g. while their definitions wait for a change in the
+# explorer's workflow repository (* matches anything); the *_yearly.csv files keep them. Here: useful heat and the
+# solar thermal and geothermal heat of buildings, whose iDesignRES definitions are not merged yet
+leave_out:
+  - Useful Energy*
+  - Final Energy|Residential and Commercial|Solar
+  - Final Energy|Residential and Commercial|Geothermal
 
 # region names in the outputs
 regions:

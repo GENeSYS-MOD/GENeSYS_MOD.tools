@@ -1,0 +1,14 @@
+CHP_Biomass_Solid,Emissions|CO2|Energy|Supply|Heat
+CHP_Biomass_Solid_CCS,Emissions|CO2|Energy|Supply|Heat
+CHP_Coal_Hardcoal,Emissions|CO2|Energy|Supply|Heat
+CHP_Coal_Hardcoal_CCS,Emissions|CO2|Energy|Supply|Heat
+CHP_Coal_Lignite,Emissions|CO2|Energy|Supply|Heat
+CHP_Coal_Lignite_CCS,Emissions|CO2|Energy|Supply|Heat
+CHP_Gas_CCGT_Biogas,Emissions|CO2|Energy|Supply|Heat
+CHP_Gas_CCGT_Biogas_CCS,Emissions|CO2|Energy|Supply|Heat
+CHP_Gas_CCGT_Natural,Emissions|CO2|Energy|Supply|Heat
+CHP_Gas_CCGT_Natural_CCS,Emissions|CO2|Energy|Supply|Heat
+CHP_Gas_CCGT_SynGas,Emissions|CO2|Energy|Supply|Heat
+CHP_Hydrogen_FuelCell,Emissions|CO2|Energy|Supply|Heat
+CHP_Oil,Emissions|CO2|Energy|Supply|Heat
+CHP_WasteToEnergy,Emissions|CO2|Energy|Supply|Heat

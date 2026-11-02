@@ -11,10 +11,14 @@ def generate_idataframe(data_wrapper, filter_only_yearly_values=False):
     model regions renamed to the region names of the scenario explorer."""
     logging.info('Executing: generate_idataframe')
     idataframe = pyam.IamDataFrame(pd.concat(list(data_wrapper.transformed_data.values())))
+    # only the model years of config.yaml (the results also hold a few 2020 rows that are no model results)
+    idataframe = idataframe.filter(year=DEF_YEARS)
 
     for step in dr.load_aggregations():
         if 'sum' in step:
-            idataframe.aggregate(variable=step['sum'], components=step.get('of'), append=True, recursive=False)
+            # recursive: all levels below the variable, bottom-up; stops if an existing level disagrees with its parts
+            idataframe.aggregate(variable=step['sum'], components=step.get('of'), append=True,
+                                 recursive=step.get('recursive', False))
         elif 'regions' in step:
             # the total over all model regions, named 'World' by pyam and renamed below
             idataframe.aggregate_region(variable=step['regions'], subregions=DEF_TOTAL_SUBREGIONS, append=True)

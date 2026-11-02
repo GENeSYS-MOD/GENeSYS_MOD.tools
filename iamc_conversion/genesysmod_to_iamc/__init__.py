@@ -78,6 +78,9 @@ def generate_combined_excel_yearly(run_validation: bool = None, files: list = No
 
     genesys = pyam.concat(lst)
     genesys = pyam.IamDataFrame(genesys.data[pyam.IAMC_IDX + ['year', 'value']])
+    if DEF_LEAVE_OUT:
+        # variables the explorer does not know yet (leave_out in config.yaml)
+        genesys = genesys.filter(variable=DEF_LEAVE_OUT, keep=False)
     name = DEF_COMBINED_FILE.format(date=time.strftime("%d-%m-%Y"), release=DEF_RELEASE)
     excel_file = DEF_OUTPUT_PATH / 'combined_excel' / name
     excel_file.parent.mkdir(parents=True, exist_ok=True)
@@ -122,6 +125,7 @@ def _generate_yearly_values(input_file, file_type: str = "gdx", generate_transmi
     if _option(None, 'additional_emissions'):
         dt.generate_additional_emissions_values(data_wrapper)
     dt.generate_secondary_energy(data_wrapper)
+    dt.generate_useful_energy_heat(data_wrapper)
     if _option(None, 'exogenous_costs'):
         dt.generate_exogenous_costs(data_wrapper)
     dt.generate_detailed_costs(data_wrapper)

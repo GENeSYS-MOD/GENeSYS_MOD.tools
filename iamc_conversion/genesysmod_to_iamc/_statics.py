@@ -29,6 +29,7 @@ DEF_FILE_TYPE = CONFIG['file_type']
 DEF_SCENARIOS = CONFIG['scenarios']
 DEF_OUTPUTS = CONFIG['outputs']
 DEF_COMBINED_FILE = CONFIG['combined_file']
+DEF_LEAVE_OUT = CONFIG.get('leave_out') or []
 
 DEF_REGION_NAME = CONFIG['regions']['total']
 DEF_EU27_NAME = CONFIG['regions']['eu27']

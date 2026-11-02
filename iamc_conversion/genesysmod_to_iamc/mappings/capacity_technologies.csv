@@ -21,17 +21,13 @@ P_Wind_Offshore_Deep,Capacity|Electricity|Wind|Offshore
 P_Wind_Onshore_Avg,Capacity|Electricity|Wind|Onshore
 P_Wind_Onshore_Inf,Capacity|Electricity|Wind|Onshore
 P_Wind_Onshore_Opt,Capacity|Electricity|Wind|Onshore
-#X_Electrolysis,Capacity|Electricity|Hydrogen|Fuel Cell
-#X_Methanation,Capacity|Hydrogen|Biomass|w/o CCS
 X_ATR_CCS,Capacity|Hydrogen|Gas|w/ CCS
 X_SMR,Capacity|Hydrogen|Gas|w/o CCS
-#X_Biofuel,Capacity|Biomass|w/o CCS
-#X_Powerfuel,Capacity|Electricity
-CHP_Gas_CCGT_Biogas,Capacity|Electricity|Gas|CCGT|w/o CCS
-CHP_Gas_CCGT_Biogas_CCS,Capacity|Electricity|Gas|CCGT|w/ CCS
+CHP_Gas_CCGT_Biogas,Capacity|Electricity|Biomass|w/o CCS
+CHP_Gas_CCGT_Biogas_CCS,Capacity|Electricity|Biomass|w/ CCS
 CHP_Gas_CCGT_Natural,Capacity|Electricity|Gas|CCGT|w/o CCS
 CHP_Gas_CCGT_Natural_CCS,Capacity|Electricity|Gas|CCGT|w/ CCS
-CHP_Gas_CCGT_SynGas,Capacity|Electricity|Synthetic Methane|w/o CCS
+CHP_Gas_CCGT_SynGas,Capacity|Electricity|Other
 CHP_Biomass_Solid,Capacity|Electricity|Biomass|w/o CCS
 CHP_Biomass_Solid_CCS,Capacity|Electricity|Biomass|w/ CCS
 CHP_Coal_Hardcoal,Capacity|Electricity|Coal|Hard Coal|w/o CCS
@@ -43,11 +39,11 @@ P_Coal_Lignite_CCS,Capacity|Electricity|Coal|Lignite|w/ CCS
 P_Biomass_CCS,Capacity|Electricity|Biomass|w/ CCS
 CHP_Oil,Capacity|Electricity|Oil|w/o CCS
 CHP_Hydrogen_FuelCell,Capacity|Electricity|Hydrogen|Fuel Cell
-CHP_WasteToEnergy,Capacity|Electricity|Other
-HMHI_Steam_Electric,Capacity|Heat|Industry|Electricity
-HHI_Scrap_EAF,Capacity|Heat|Industry|Electricity
-HHI_Molten_Electrolysis,Capacity|Heat|Industry|Electricity
-HLI_Direct_Electric,Capacity|Heat|Industry|Electricity
+CHP_WasteToEnergy,Capacity|Electricity|Waste
+HMHI_Steam_Electric,Capacity|Heat|Industry|Electricity|Direct
+HHI_Scrap_EAF,Capacity|Heat|Industry|Electricity|Direct
+HHI_Molten_Electrolysis,Capacity|Heat|Industry|Electricity|Direct
+HLI_Direct_Electric,Capacity|Heat|Industry|Electricity|Direct
 HB_Direct_Electric,Capacity|Heat|Residential and Commercial|Electricity|Direct
 HB_Solar_Thermal,Capacity|Heat|Residential and Commercial|Solar
 HB_Heatpump_Aerial,Capacity|Heat|Residential and Commercial|Electricity|Heat Pump|Air Sourced
@@ -78,7 +74,7 @@ HHI_BF_BOF_CCS,Capacity|Heat|Industry|Coal|Hard Coal|w/ CCS
 HHI_DRI_EAF_CCS,Capacity|Heat|Industry|Gas
 HMHI_Gas_CCS,Capacity|Heat|Industry|Gas
 HMHI_HardCoal_CCS,Capacity|Heat|Industry|Coal|Hard Coal|w/ CCS
-HB_H2_Boiler,Capacity|Heat|Industry|Hydrogen
+HB_H2_Boiler,Capacity|Heat|Residential and Commercial|Hydrogen
 HLI_H2_Boiler,Capacity|Heat|Industry|Hydrogen
 #CHP_Coal_Hardcoal,Capacity|Heat|Residential and Commercial|Coal|Hard Coal|w/o CCS
 HB_Lignite,Capacity|Heat|Residential and Commercial|Coal|Lignite
@@ -98,3 +94,15 @@ P_Gas_Engines,Capacity|Electricity|Gas|Engine
 P_Gas_OCGT,Capacity|Electricity|Gas|OCGT|w/o CCS
 P_Gas_CCS,Capacity|Electricity|Gas|w/ CCS
 HMHI_H2,Capacity|Heat|Industry|Hydrogen
+HLI_Heatpump,Capacity|Heat|Industry|Electricity|Heat Pump
+HMLI_Heatpump,Capacity|Heat|Industry|Electricity|Heat Pump
+HD_Electric_Boiler,Capacity|Heat|Electricity
+HD_Heatpump_Air,Capacity|Heat|Electricity
+HD_Heatpump_ExcessHeat,Capacity|Heat|Electricity
+HD_Geothermal,Capacity|Heat|Geothermal
+HD_Solar_Thermal,Capacity|Heat|Solar
+HD_Gas_Boiler,Capacity|Heat|Gas
+X_Electrolysis,Capacity|Hydrogen|Electricity
+X_Methanation,Capacity|Gases
+X_Biofuel,Capacity|Liquids|Biomass
+X_Powerfuel,Capacity|Liquids|Electricity

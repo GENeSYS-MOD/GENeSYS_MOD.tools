@@ -25,14 +25,13 @@ P_Biomass_CCS,Secondary Energy|Electricity|Biomass|w/ CCS
 P_Coal_Hardcoal_CCS,Secondary Energy|Electricity|Coal|Hard Coal|w/ CCS
 P_Coal_Lignite_CCS,Secondary Energy|Electricity|Coal|Lignite|w/ CCS
 HLI_Fuelcell,Secondary Energy|Electricity|Other
-HLI_Fuelcell,Secondary Energy|Electricity|Other
 X_Fuel_Cell,Secondary Energy|Electricity|Other
-P_H2_OCGT,Secondary Energy|Electricity|Other
-CHP_Gas_CCGT_Biogas,Secondary Energy|Electricity|Gas|CCGT|w/o CCS
-CHP_Gas_CCGT_Biogas_CCS,Secondary Energy|Electricity|Gas|CCGT|w/ CCS
+P_H2_OCGT,Secondary Energy|Electricity|Hydrogen|OCGT
+CHP_Gas_CCGT_Biogas,Secondary Energy|Electricity|Biomass|w/o CCS
+CHP_Gas_CCGT_Biogas_CCS,Secondary Energy|Electricity|Biomass|w/ CCS
 CHP_Gas_CCGT_Natural,Secondary Energy|Electricity|Gas|CCGT|w/o CCS
 CHP_Gas_CCGT_Natural_CCS,Secondary Energy|Electricity|Gas|CCGT|w/ CCS
-CHP_Gas_CCGT_SynGas,Secondary Energy|Electricity|Synthetic Methane|w/o CCS
+CHP_Gas_CCGT_SynGas,Secondary Energy|Electricity|Other
 CHP_Biomass_Solid,Secondary Energy|Electricity|Biomass|w/o CCS
 CHP_Biomass_Solid_CCS,Secondary Energy|Electricity|Biomass|w/ CCS
 CHP_Coal_Hardcoal,Secondary Energy|Electricity|Coal|Hard Coal|w/o CCS
@@ -45,3 +44,12 @@ P_Gas_CCGT,Secondary Energy|Electricity|Gas|CCGT|w/o CCS
 P_Gas_Engines,Secondary Energy|Electricity|Gas|w/o CCS
 P_Gas_OCGT,Secondary Energy|Electricity|Gas|OCGT|w/o CCS
 P_Gas_CCS,Secondary Energy|Electricity|Gas|w/ CCS
+CHP_WasteToEnergy,Secondary Energy|Electricity|Waste
+P_Gas_CCGT:2,Secondary Energy|Electricity|Biomass|w/o CCS
+P_Gas_CCGT:3,Secondary Energy|Electricity|Other
+P_Gas_OCGT:2,Secondary Energy|Electricity|Biomass|w/o CCS
+P_Gas_OCGT:3,Secondary Energy|Electricity|Other
+P_Gas_Engines:2,Secondary Energy|Electricity|Biomass|w/o CCS
+P_Gas_Engines:3,Secondary Energy|Electricity|Other
+P_Gas_CCS:2,Secondary Energy|Electricity|Biomass|w/ CCS
+P_Gas_CCS:3,Secondary Energy|Electricity|Other

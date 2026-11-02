@@ -2,7 +2,6 @@ D_PHS,Electricity|Electricity Storage|Pumped Storage
 D_Battery_Li-Ion,Electricity|Electricity Storage|Lithium-Ion
 D_Battery_Redox,Electricity|Electricity Storage|Redox Flow
 D_CAES,Electricity|Electricity Storage|Compressed Air
-D_PHS,Electricity|Electricity Storage|Pumped Storage
 D_PHS_Residual,Electricity|Electricity Storage|Pumped Storage
 D_Gas_H2,Energy Storage|Hydrogen|Salt Cavern
 D_Gas_Methane,Energy Storage|Methane|Salt Cavern

@@ -1,8 +1,8 @@
 """Turns the GENeSYS-MOD results of one scenario into IAMC variables.
 
 The variable names come from the files in mappings/ (GENeSYS-MOD name -> IAMC variable, see README.md); this file
-only selects the results, converts units and adds EU27. The sums of variables are added afterwards
-(pyam_aggregator.py, mappings/aggregations.yaml).
+selects the results, converts units, splits the fuel and emissions of CHPs into electricity and heat, and adds
+EU27. The sums of variables are added afterwards (pyam_aggregator.py, mappings/aggregations.yaml).
 """
 import genesysmod_to_iamc.data_reader as dr
 import genesysmod_to_iamc.data_wrapper as dw
@@ -13,6 +13,10 @@ import itertools
 from genesysmod_to_iamc._statics import *
 
 IAMC_COLUMNS = ['Model', 'Scenario', 'Region', 'Variable', 'Unit', 'Subannual', 'Year', 'Value']
+# heat that end uses take: buildings and the four temperature levels of industry (district heat is Heat_District)
+HEAT_FUELS = ['Heat_Buildings', 'Heat_Low_Industrial', 'Heat_MediumLow_Industrial', 'Heat_MediumHigh_Industrial',
+              'Heat_High_Industrial']
+MODE_KEYS = ['region', 'technology', 'mode', 'subannual', 'year']
 
 
 def _set_scenarios(frame: pd.DataFrame, data_wrapper: dw.DataWrapper):
@@ -27,6 +31,21 @@ def _set_timeslices(frame: pd.DataFrame, data_wrapper: dw.DataWrapper):
 def _rename(frame: pd.DataFrame, column: str, mapping: dict):
     """Replace the GENeSYS-MOD names in a column by the names of a mapping."""
     return frame.replace({column: mapping})
+
+
+def _select(frame: pd.DataFrame, mapping: dict, column: str = 'technology'):
+    """The rows whose name in column is a key of mapping, with the name replaced by the IAMC variable. A key
+    technology:mode applies to that operating mode only and wins over the key without mode (e.g. the biogas mode
+    of a gas plant)."""
+    keys = mapping.keys()
+    names = frame[column].astype(str)
+    if 'mode' in frame.columns:
+        with_mode = names + ':' + frame['mode'].astype(str)
+        names = with_mode.where(with_mode.isin(keys), names)
+    mask = names.isin(keys).to_numpy()
+    frame = frame[mask].copy()
+    frame[column] = names[mask].map(mapping).to_numpy()
+    return frame
 
 
 def _to_iamc(frame: pd.DataFrame, column: str, how: str = 'sum'):
@@ -54,48 +73,84 @@ def _add_eu27(frame: pd.DataFrame, copy_of: str = None):
 
 
 def _add_zero_variables(frame: pd.DataFrame, kind: str):
-    """Add the variables of mappings/zero_var.csv of this kind with the value 0 for every region and year
-    (variables starting with # are switched off)."""
+    """Add the variables of mappings/zero_var.csv of this kind with the value 0 for every region and year in which
+    the model has no value for them (variables starting with # are switched off)."""
     zero_var = dr.loaddf_from_csv('zero_var')
     variables = zero_var[zero_var['Type'] == kind]['Variable']
     zeros = pd.DataFrame(list(itertools.product(frame['Region'].unique(), frame['Year'].unique(), variables)),
                          columns=['Region', 'Year', 'Variable'])
     zeros = zeros[~zeros['Variable'].str.startswith('#')]
+    present = frame.set_index(['Region', 'Year', 'Variable']).index
+    zeros = zeros[~zeros.set_index(['Region', 'Year', 'Variable']).index.isin(present)]
     first = frame.iloc[0]
     zeros[['Model', 'Scenario', 'Unit', 'Subannual', 'Value']] = first['Model'], first['Scenario'], first['Unit'], 'Year', 0
     return pd.concat([frame, zeros])
+
+
+def _power_shares(data_wrapper: dw.DataWrapper, rows: pd.DataFrame):
+    """For each row (fuel use of a technology), the share of electricity in the output of its operating mode in that
+    region, time slice and year: electricity / (electricity + district heat). It is 1 for a mode without district
+    heat and 0 for a mode without electricity; only the CHP modes that make both lie in between."""
+    prod = data_wrapper.production_values
+    prod = prod[prod['fuel'].isin(['Power', 'Heat_District'])]
+    out = prod.pivot_table(index=MODE_KEYS, columns='fuel', values='value', aggfunc='sum', fill_value=0).abs()
+    out = out.reindex(columns=['Power', 'Heat_District'], fill_value=0)
+    share = (out['Power'] / (out['Power'] + out['Heat_District'])).rename('share').reset_index()
+    return rows[MODE_KEYS].merge(share, on=MODE_KEYS, how='left')['share'].fillna(1).to_numpy()
+
+
+def _heat_shares(data_wrapper: dw.DataWrapper, technologies):
+    """The share of the fuel of each technology, region and year that made district heat (see _power_shares). The
+    model's emissions are proportional to the fuel use in every operating mode, so this also splits emissions."""
+    fuel = data_wrapper.usage_values
+    fuel = fuel[fuel['technology'].isin(technologies)].copy()
+    fuel['value'] = fuel['value'].abs()
+    fuel['heat'] = fuel['value'] * (1 - _power_shares(data_wrapper, fuel))
+    total = fuel.groupby(['region', 'technology', 'year'])[['value', 'heat']].sum()
+    return (total['heat'] / total['value']).rename('heat_share').reset_index()
+
+
+def _primary_energy_by_use(data_wrapper: dw.DataWrapper):
+    """Fuel of power plants, CHPs and heat plants as Primary Energy|<fuel>|Electricity and |Heat
+    (primary_energy_electricity.csv, primary_energy_heat.csv). The fuel of a CHP mode that makes both is split by
+    the shares of the two outputs."""
+    map_electricity = dr.loadmap_from_csv('primary_energy_electricity')
+    map_heat = dr.loadmap_from_csv('primary_energy_heat')
+    technologies = {key.split(':')[0] for key in list(map_electricity) + list(map_heat)}
+
+    fuel = data_wrapper.usage_values
+    fuel = fuel[fuel['technology'].isin(technologies)].copy()
+    share = _power_shares(data_wrapper, fuel)
+    electricity = _select(fuel.assign(value=fuel['value'] * share), map_electricity)
+    heat = _select(fuel.assign(value=fuel['value'] * (1 - share)), map_heat)
+
+    by_use = pd.concat([electricity, heat])
+    by_use['fuel'] = by_use['technology']
+    return by_use
 
 
 def generate_primary_energy_values(data_wrapper: dw.DataWrapper):
     logging.info('Executing: generate_primary_energy_values')
     map_primary_fuels = dr.loadmap_from_csv('primary_energy_fuels')
     map_renewables = dr.loadmap_from_csv('primary_energy_renewables')
-    map_electricity = dr.loadmap_from_csv('primary_energy_electricity')
 
     prod_values = data_wrapper.production_values.copy()
     use_values = data_wrapper.usage_values.copy()
 
     # fuels used (outside storage), by fuel
     traditional_energy = use_values[use_values['fuel'].isin(map_primary_fuels.keys())].copy()
-    traditional_energy = traditional_energy[traditional_energy['sector'] != 'Storage']
+    traditional_energy = traditional_energy[traditional_energy['sector'] != 'Storages']
     traditional_energy['value'] = abs(traditional_energy['value'])
     traditional_energy = _rename(traditional_energy, 'fuel', map_primary_fuels)
 
-    # non-biomass renewables, by the technology that produces them
-    non_res_biomass = prod_values[prod_values['technology'].isin(map_renewables.keys())].copy()
-    non_res_biomass = _rename(non_res_biomass, 'technology', map_renewables)
+    # non-biomass renewables: the output of the technologies that use them
+    non_res_biomass = _select(prod_values, map_renewables)
     non_res_biomass['fuel'] = non_res_biomass['technology']
 
     nuclear = use_values[use_values['technology'] == 'P_Nuclear'].copy()
     nuclear['fuel'] = 'Primary Energy|Nuclear'
 
-    # fuels used for electricity, by the power plant (mode 1)
-    electricity = use_values[use_values['technology'].isin(map_electricity.keys())].copy()
-    electricity = _rename(electricity, 'technology', map_electricity)
-    electricity = electricity[electricity['mode'] == '1']
-    electricity['fuel'] = electricity['technology']
-
-    primary_energy = pd.concat([traditional_energy, non_res_biomass, nuclear, electricity])
+    primary_energy = pd.concat([traditional_energy, non_res_biomass, nuclear, _primary_energy_by_use(data_wrapper)])
 
     primary_energy['model'] = DEF_MODEL_AND_VERSION
     primary_energy['unit'] = 'EJ/yr'
@@ -116,23 +171,28 @@ def generate_final_energy_values(data_wrapper: dw.DataWrapper):
     use_values = data_wrapper.usage_values.copy()
     map_final_sector = dr.loadmap_from_csv('final_energy_sector')
     map_final_fuel = dr.loadmap_from_csv('final_energy_fuel')
+    map_final_output = dr.loadmap_from_csv('final_energy_output')
 
-    # variable = sector part (final_energy_sector.csv) | fuel part (final_energy_fuel.csv)
+    # fuel used by end-use technologies: variable = sector part (final_energy_sector.csv) | fuel part
+    # (final_energy_fuel.csv)
     use_values = use_values[use_values['technology'].isin(map_final_sector.keys())]
     use_values = use_values[use_values['fuel'].isin(map_final_fuel.keys())]
     use_values = _rename(use_values, 'technology', map_final_sector)
     use_values = _rename(use_values, 'fuel', map_final_fuel)
     use_values['fuel'] = use_values['technology'] + '|' + use_values['fuel']
 
-    # electricity demand outside the three sectors, removed again after the sums (aggregations.yaml)
+    # the electricity demand that the model does not assign to a sector
     use_electricity_values = data_wrapper.usage_values.copy()
     use_electricity_values = use_electricity_values[use_electricity_values['fuel'] == 'Power']
     use_electricity_values = use_electricity_values[use_electricity_values['technology'] == 'Demand']
-    use_electricity_values['fuel'] = 'Final Energy|ElectricityDummy'
+    use_electricity_values['fuel'] = 'Final Energy|Other Sector|Electricity'
 
-    use_heat_values = _extract_final_energy_heat(data_wrapper)
+    # final energy at the output of a technology (final_energy_output.csv): district heat where it is delivered,
+    # solar thermal and geothermal heat where it is used
+    output_values = _select(data_wrapper.production_values.copy(), map_final_output)
+    output_values['fuel'] = output_values['technology']
 
-    final_energy = pd.concat([use_values, use_electricity_values, use_heat_values])
+    final_energy = pd.concat([use_values, use_electricity_values, output_values])
 
     final_energy['model'] = DEF_MODEL_AND_VERSION
     final_energy['unit'] = 'EJ/yr'
@@ -146,15 +206,6 @@ def generate_final_energy_values(data_wrapper: dw.DataWrapper):
 
     data_wrapper.transformed_data['final_energy'] = final_energy
     return final_energy
-
-
-def _extract_final_energy_heat(data_wrapper):
-    raw = data_wrapper.usage_values.copy()
-    heat_fuels = ['Heat_Buildings', 'Heat_Low_Industrial', 'Heat_MediumLow_Industrial', 'Heat_MediumHigh_Industrial',
-                  'Heat_High_Industrial']
-    heat = pd.concat([raw[(raw['fuel'] == fuel) & (raw['technology'] == 'Demand')] for fuel in heat_fuels])
-    heat['fuel'] = 'Final Energy|Heat'
-    return heat
 
 
 def generate_capacity_values(data_wrapper: dw.DataWrapper):
@@ -271,10 +322,21 @@ def generate_transport_capacity_values(data_wrapper: dw.DataWrapper):
 def generate_emissions_values(data_wrapper: dw.DataWrapper):
     logging.info('Executing: generate_emissions_values')
     map_emissions_technologies = dr.loadmap_from_csv('emissions_technologies')
+    map_emissions_heat = dr.loadmap_from_csv('emissions_heat')
 
     emission_values = data_wrapper.emission_values.copy()
     emission_values = emission_values[emission_values['technology'].isin(map_emissions_technologies.keys())]
+
+    # CHPs (emissions_heat.csv): the share of the fuel that made district heat goes to the heat variable
+    chp = emission_values['technology'].isin(map_emissions_heat.keys()).to_numpy()
+    share = emission_values.loc[chp, ['region', 'technology', 'year']].merge(
+        _heat_shares(data_wrapper, map_emissions_heat.keys()), how='left')['heat_share'].fillna(0).to_numpy()
+    heat_values = emission_values[chp].copy()
+    heat_values['value'] = heat_values['value'].to_numpy() * share
+    heat_values = _rename(heat_values, 'technology', map_emissions_heat)
+    emission_values.loc[chp, 'value'] = emission_values.loc[chp, 'value'].to_numpy() * (1 - share)
     emission_values = _rename(emission_values, 'technology', map_emissions_technologies)
+    emission_values = pd.concat([emission_values, heat_values])
 
     emission_values['model'] = DEF_MODEL_AND_VERSION
     emission_values['unit'] = 'Mt CO2/yr'
@@ -311,31 +373,15 @@ def generate_additional_emissions_values(data_wrapper: dw.DataWrapper):
 
 def generate_secondary_energy(data_wrapper: dw.DataWrapper):
     logging.info('Executing: generate_secondary_energy')
-    map_secondary_energy_power = dr.loadmap_from_csv('secondary_energy_power')
     prod_values = data_wrapper.production_values.copy()
 
-    power_values = prod_values[prod_values['technology'].isin(map_secondary_energy_power.keys())].copy()
-    power_values = power_values[power_values['fuel'] == 'Power']
-    power_values = _rename(power_values, 'technology', map_secondary_energy_power)
+    power_values = _select(prod_values[prod_values['fuel'] == 'Power'], dr.loadmap_from_csv('secondary_energy_power'))
     power_values['unit'] = 'EJ/yr'
 
-    map_secondary_energy_heat = dr.loadmap_from_csv('secondary_energy_heat')
-    heat_values = prod_values.copy()
-
-    heat_values = heat_values[(heat_values['fuel'] == 'Heat_Buildings') |
-                              (heat_values['fuel'] == 'Heat_Low_Industrial') |
-                              (heat_values['fuel'] == 'Heat_MediumLow_Industrial') |
-                              (heat_values['fuel'] == 'Heat_MediumHigh_Industrial') |
-                              (heat_values['fuel'] == 'Heat_High_Industrial')]
-
-    #rename X_Convert_HD technologies, so they can be correctly assigned to their sector
-    mask_hd = heat_values["technology"].eq("X_Convert_HD")
-
-    heat_values.loc[mask_hd & heat_values["fuel"].eq("Heat_Low_Industrial"), "technology"] = "X_Convert_HD_HLI"
-    heat_values.loc[mask_hd & heat_values["fuel"].eq("Heat_Buildings"), "technology"] = "X_Convert_HD_HB"
-
-    heat_values = heat_values[heat_values["technology"].isin(map_secondary_energy_heat.keys())].copy()
-    heat_values = _rename(heat_values, 'technology', map_secondary_energy_heat)
+    # centralized heat: the district heat of CHPs and heat plants (the pit storage is not listed); heat made in
+    # buildings and industry is useful energy (generate_useful_energy_heat)
+    heat_values = prod_values[prod_values['fuel'] == 'Heat_District']
+    heat_values = _select(heat_values, dr.loadmap_from_csv('secondary_energy_heat'))
     heat_values['unit'] = 'EJ/yr'
 
     # switched off: secondary energy of transport technologies
@@ -366,6 +412,27 @@ def generate_secondary_energy(data_wrapper: dw.DataWrapper):
 
     data_wrapper.transformed_data['secondary_energy'] = secondary_energy
     return secondary_energy
+
+
+def generate_useful_energy_heat(data_wrapper: dw.DataWrapper):
+    """The heat that end uses receive, by sector and source (useful_energy_heat.csv): heat made in buildings and
+    industry, and district heat after the network. Heat storages are not listed, so heat counts once, when made."""
+    logging.info('Executing: generate_useful_energy_heat')
+    prod_values = data_wrapper.production_values.copy()
+
+    useful_heat = _select(prod_values[prod_values['fuel'].isin(HEAT_FUELS)], dr.loadmap_from_csv('useful_energy_heat'))
+
+    useful_heat['model'] = DEF_MODEL_AND_VERSION
+    useful_heat['unit'] = 'EJ/yr'
+    useful_heat['value'] = abs(useful_heat['value'] / 1000)
+
+    useful_heat = _set_scenarios(useful_heat, data_wrapper)
+    useful_heat = _set_timeslices(useful_heat, data_wrapper)
+    useful_heat = _transform_columns(useful_heat, 'technology')
+    useful_heat = _add_eu27(useful_heat)
+
+    data_wrapper.transformed_data['useful_energy_heat'] = useful_heat
+    return useful_heat
 
 
 def _generate_exogenous_costs_values(data_wrapper: dw.DataWrapper, cost_type: str):
