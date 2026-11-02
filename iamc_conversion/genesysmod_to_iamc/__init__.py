@@ -15,6 +15,7 @@ import genesysmod_to_iamc.data_reader as dr
 import genesysmod_to_iamc.data_transform as dt
 import genesysmod_to_iamc.series_generator as sg
 
+import nomenclature  # noqa: F401 (imported before the logging setup below, which its first import would undo)
 import pyam
 from genesysmod_to_iamc.validation import validate, update_workflow_repo
 
@@ -24,7 +25,10 @@ import os
 import time
 
 
-logging.basicConfig(level=logging.INFO)
+# print each step of the conversion with the time it starts, in the notebook and in a terminal; in a notebook, pyam
+# and nomenclature set the root logger to warnings only when they are imported, so the level is set after them
+logging.basicConfig(format='[%(levelname)s] %(asctime)s - %(name)s: %(message)s', datefmt='%H:%M:%S')
+logging.getLogger().setLevel(logging.INFO)
 
 
 def run():
@@ -32,7 +36,16 @@ def run():
     Returns the path of the Excel file."""
     for input_file in settings.scenarios:
         generate_data(input_file)
-    return generate_combined_excel_yearly(files=[input_file + '_yearly.csv' for input_file in settings.scenarios])
+    excel_file = generate_combined_excel_yearly(files=[input_file + '_yearly.csv' for input_file in settings.scenarios],
+                                                run_validation=False)
+    done = f'Done: {", ".join(settings.scenarios.values())} converted, upload file {excel_file}'
+    if not settings.run_validation:
+        logging.info(f'{done} (not checked, run_validation is off)')
+    elif validate(excel_file):
+        logging.info(f'{done}, check PASSED')
+    else:
+        logging.error(f'{done}, check FAILED: see {settings.output_path / "validation_report.txt"}')
+    return excel_file
 
 
 def generate_data(input_file: str, file_type: str = None, generate_series_data: bool = None,
@@ -52,6 +65,7 @@ def generate_data(input_file: str, file_type: str = None, generate_series_data: 
     if not os.path.exists(settings.output_path):
         os.makedirs(settings.output_path)
 
+    logging.info(f'Converting scenario {_scenario_name(input_file)} ({input_file})')
     data_wrapper = _generate_yearly_values(input_file, file_type, generate_transmission_data)
     output_name = data_wrapper.input_file + "_yearly.csv"
 
@@ -76,6 +90,7 @@ def generate_combined_excel_yearly(run_validation: bool = None, files: list = No
     validate it with the scenario explorer workflow (see validation.py). Returns the path of the Excel file."""
     if files is None:
         files = [filename for filename in os.listdir(settings.output_path) if filename.endswith("_yearly.csv")]
+    logging.info('Combining the yearly values of all scenarios in the upload file')
     lst =[pyam.IamDataFrame(str(settings.output_path / filename)) for filename in files]
 
     genesys = pyam.concat(lst)

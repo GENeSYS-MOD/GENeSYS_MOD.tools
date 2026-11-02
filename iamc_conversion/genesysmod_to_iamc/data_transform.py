@@ -235,7 +235,11 @@ def generate_transmission_capacity_values(data_wrapper: dw.DataWrapper):
     trade_values = data_wrapper.trade_capacity_values.copy()
     trade_values = trade_values[(trade_values['type'] == 'Transmissions Capacity') & trade_values['fuel'].isin(['Power', 'Gas_Natural', 'H2'])]
     trade_values['model'] = settings.model
-    trade_values['value'] = abs(trade_values['value'])*1000
+    # the model's capacity of power lines is in GW, that of gas and hydrogen pipelines in PJ per year (the import of
+    # a time slice is at most capacity * YearSplit); the explorer wants MW for power lines and GW for pipelines
+    # (1 GW = 31.536 PJ per year)
+    to_unit = {'Power': 1000, 'Gas_Natural': 1 / 31.536, 'H2': 1 / 31.536}
+    trade_values['value'] = abs(trade_values['value']) * trade_values['fuel'].map(to_unit)
     trade_values['subannual'] = 'Year'
 
     fuel_to_carrier = {
@@ -248,8 +252,8 @@ def generate_transmission_capacity_values(data_wrapper: dw.DataWrapper):
 
     fuel_to_unit = {
         'Power': 'MW',
-        'Gas_Natural': 'TJ',
-        'H2': 'TJ'
+        'Gas_Natural': 'GW',
+        'H2': 'GW'
     }
 
     trade_values['unit'] = trade_values['fuel'].map(fuel_to_unit)
@@ -264,7 +268,6 @@ def generate_transmission_capacity_values(data_wrapper: dw.DataWrapper):
     trade_values = _to_iamc(trade_values, 'variable')
 
     data_wrapper.transformed_data['transmission'] = trade_values
-    trade_values.to_csv(settings.output_path / "trade_values.csv", index=False)
     return trade_values
 
 

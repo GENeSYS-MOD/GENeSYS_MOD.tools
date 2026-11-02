@@ -55,15 +55,22 @@ def validate(data, update: bool = True, report_file=None) -> bool:
     local_dir = update_workflow_repo() if update else workflow_repo_dir()
     main = _load_workflow(local_dir)
 
+    logging.info('Checking the data with the workflow of the scenario explorer')
     messages = _LogCollector()
     for name in ('nomenclature', 'pyam'):
         logging.getLogger(name).addHandler(messages)
+    # during the check, pyam.core only warns about empty selections, e.g. one for every variable with value checks
+    # that the data does not have; nomenclature silences these, but pyam's aggregate (used in the conversion)
+    # leaves its own level on this logger, which keeps them on
+    pyam_core = logging.getLogger('pyam.core')
+    pyam_core.setLevel(logging.ERROR)
     try:
         main(df)
         passed, error = True, None
     except Exception as e:
-        passed, error = False, f'{type(e).__name__}: {e}'
+        passed, error = False, _describe(e)
     finally:
+        pyam_core.setLevel(logging.NOTSET)
         for name in ('nomenclature', 'pyam'):
             logging.getLogger(name).removeHandler(messages)
 
@@ -74,6 +81,14 @@ def validate(data, update: bool = True, report_file=None) -> bool:
     else:
         logging.error(f'Validation failed; see {report_file}')
     return passed
+
+
+def _describe(error, depth=0) -> str:
+    """The error with all its sub-errors: nomenclature collects the errors of a check in one error, whose own
+    message only counts them."""
+    lines = ['  ' * depth + f'{type(error).__name__}: {error}']
+    lines += [_describe(sub, depth + 1) for sub in getattr(error, 'exceptions', ())]
+    return '\n'.join(lines)
 
 
 def _load_workflow(local_dir: Path):

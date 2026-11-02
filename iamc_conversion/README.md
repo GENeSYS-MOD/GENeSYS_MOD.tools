@@ -101,6 +101,8 @@ by switched-off code.
 ## Assumptions in the conversion
 
 - Energy is converted from PJ to EJ/yr; capacities are in GW, transport capacities in Gvkm, emissions in Mt CO2/yr.
+  Network capacities are in MW for power lines and in GW for gas and hydrogen pipelines, whose capacity the model
+  gives in PJ per year (1 GW = 31.536 PJ per year).
 - Heat as in the IAMC definitions: `Secondary Energy|Heat` is centralized heat, i.e. the district heat
   (`Heat_District`) of CHPs and heat plants. `Final Energy|<sector>|Heat` is the district heat delivered, the output
   of `X_Convert_HD` (mode 1 buildings, mode 2 industry); the difference is network and storage losses.
